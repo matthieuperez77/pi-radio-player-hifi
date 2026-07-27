@@ -125,7 +125,9 @@ i2cdetect -y 1
 # radio/config.py seulement si ce n'est pas la carte par défaut
 aplay -l
 
-python3 -m venv .venv
+python3 -m venv --system-site-packages .venv   # réutilise gpiozero/lgpio déjà
+                                                 # installés via apt - sinon pip
+                                                 # tente de compiler lgpio (swig requis)
 .venv/bin/pip install -r requirements.txt
 ```
 
