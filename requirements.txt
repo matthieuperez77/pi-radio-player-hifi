@@ -1,0 +1,6 @@
+pyyaml
+requests
+smbus2
+gpiozero
+lgpio
+RPLCD

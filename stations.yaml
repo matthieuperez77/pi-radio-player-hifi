@@ -1,0 +1,309 @@
+# Configuration des stations.
+#
+# Schéma (plus de switch_pin/led_pin/logo : la sélection passe par l'encodeur
+# "tuner" + les 4 favoris, et l'écran est un LCD texte, pas de logos) :
+#   id            -> identifiant interne stable (utilisé pour les favoris/état)
+#   name          -> nom affiché sur le LCD
+#   stream_urls   -> liste ORDONNÉE de flux, du meilleur au plus dégradé ;
+#                    Player essaie le premier, puis se replie automatiquement
+#                    sur le suivant si mpv signale une erreur de lecture,
+#                    avant d'afficher l'écran d'erreur (cf. radio/main.py)
+#   metadata.type :
+#     radiofrance_livemeta -> nom de la case/émission en cours (station_id
+#                             numérique de l'API livemeta - seuls francemusique
+#                             (4) et fip (7) sont confirmés à ce stade ; les
+#                             autres id restent à identifier, cf. note plus bas)
+#     none                  -> pas de métadonnée disponible (LCD : nom de
+#                             station seul)
+
+refresh_interval_seconds: 600
+
+# Pour trouver le station_id manquant d'une chaîne Radio France : essayer
+# https://api.radiofrance.fr/livemeta/pull/<id> avec de petits entiers et
+# vérifier que le nom de chaîne dans la réponse JSON correspond - non
+# documenté officiellement, à faire au cas par cas si les métadonnées de
+# cette chaîne intéressent particulièrement.
+
+stations:
+  # --- Radio France : réseau national (généralistes) ------------------------
+  - id: franceinter
+    name: "France Inter"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/franceinter-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/franceinter-midfi.mp3?id=radiofrance"
+      - "https://icecast.radiofrance.fr/franceinter-lofi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: franceinfo
+    name: "France Info"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/franceinfo-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/franceinfo-midfi.mp3?id=radiofrance"
+      - "https://icecast.radiofrance.fr/franceinfo-lofi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: franceculture
+    name: "France Culture"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/franceculture-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/franceculture-midfi.mp3?id=radiofrance"
+      - "https://icecast.radiofrance.fr/franceculture-lofi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: mouv
+    name: "Mouv'"
+    # Slug "mouv" à confirmer sur le matériel réel (parfois référencé
+    # "lemouv" dans certains agrégateurs tiers).
+    stream_urls:
+      - "https://icecast.radiofrance.fr/mouv-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/mouv-midfi.mp3?id=radiofrance"
+      - "https://icecast.radiofrance.fr/mouv-lofi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  # --- France Musique + webradios thématiques --------------------------------
+  - id: francemusique
+    name: "France Musique"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/francemusique-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusique-midfi.mp3?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusique-lofi.mp3?id=radiofrance"
+    metadata:
+      type: radiofrance_livemeta
+      station_id: 4
+
+  - id: francemusiquebaroque
+    name: "FM Baroque"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/francemusiquebaroque-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusiquebaroque-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: francemusiqueclassiqueplus
+    name: "FM Classique Plus"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/francemusiqueclassiqueplus-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusiqueclassiqueplus-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: francemusiqueconcertsradiofrance
+    name: "FM Concerts"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/francemusiqueconcertsradiofrance-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusiqueconcertsradiofrance-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: francemusiqueeasyclassique
+    name: "FM Easy Classique"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/francemusiqueeasyclassique-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusiqueeasyclassique-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: francemusiquelabo
+    name: "FM Le Labo"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/francemusiquelabo-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusiquelabo-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: francemusiquelacontemporaine
+    name: "FM La Contemporaine"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/francemusiquelacontemporaine-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusiquelacontemporaine-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: francemusiquelajazz
+    name: "FM La Jazz"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/francemusiquelajazz-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusiquelajazz-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: francemusiqueocoramonde
+    name: "FM Ocora Monde"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/francemusiqueocoramonde-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/francemusiqueocoramonde-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  # --- FIP + webradios thématiques --------------------------------------------
+  - id: fip
+    name: "FIP"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fip-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fip-midfi.mp3?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fip-lofi.mp3?id=radiofrance"
+    metadata:
+      type: radiofrance_livemeta
+      station_id: 7
+
+  - id: fipelectro
+    name: "FIP Électro"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fipelectro-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fipelectro-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fipgroove
+    name: "FIP Groove"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fipgroove-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fipgroove-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fiphiphop
+    name: "FIP Hip-Hop"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fiphiphop-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fiphiphop-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fipjazz
+    name: "FIP Jazz"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fipjazz-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fipjazz-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fipmetal
+    name: "FIP Metal"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fipmetal-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fipmetal-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fipnouveautes
+    name: "FIP Nouveautés"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fipnouveautes-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fipnouveautes-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fippop
+    name: "FIP Pop"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fippop-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fippop-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fipreggae
+    name: "FIP Reggae"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fipreggae-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fipreggae-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fiprock
+    name: "FIP Rock"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fiprock-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fiprock-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fipsacrefrancais
+    name: "FIP Sacré Français"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fipsacrefrancais-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fipsacrefrancais-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  - id: fipworld
+    name: "FIP Monde"
+    stream_urls:
+      - "https://icecast.radiofrance.fr/fipworld-hifi.aac?id=radiofrance"
+      - "https://icecast.radiofrance.fr/fipworld-midfi.mp3?id=radiofrance"
+    metadata:
+      type: none
+
+  # --- Sélection internationale -----------------------------------------------
+  # Services tiers (pas Radio France) : chaque URL ci-dessous est un point de
+  # départ confirmé par recherche mais À VALIDER avec mpv sur le matériel réel
+  # avant mise en service durable (moins stables que icecast.radiofrance.fr).
+
+  # Jazz / Classique
+  - id: radioswissjazz
+    name: "Radio Swiss Jazz"
+    stream_urls:
+      - "http://www.radioswissjazz.ch/live/aacp.m3u"
+      - "http://www.radioswissjazz.ch/live/mp3.m3u"
+    metadata:
+      type: none
+
+  - id: radioswissclassic
+    name: "Radio Swiss Classic"
+    stream_urls:
+      - "http://www.radioswissclassic.ch/live/aacp.m3u"
+      - "http://www.radioswissclassic.ch/live/mp3.m3u"
+    metadata:
+      type: none
+
+  # Rock / Pop / Alternatif / Électro
+  - id: radioparadise
+    name: "Radio Paradise"
+    stream_urls:
+      - "http://stream.radioparadise.com/aac-320"
+      - "http://stream.radioparadise.com/mp3-192"
+    metadata:
+      type: none
+
+  - id: radioparadiserock
+    name: "Radio Paradise Rock"
+    stream_urls:
+      - "http://stream.radioparadise.com/rock-320"
+      - "http://stream.radioparadise.com/rock-192"
+    metadata:
+      type: none
+
+  - id: somafmgroovesalad
+    name: "SomaFM Groove Salad"
+    stream_urls:
+      - "https://somafm.com/groovesalad.pls"
+    metadata:
+      type: none
+
+  - id: somafmdronezone
+    name: "SomaFM Drone Zone"
+    stream_urls:
+      - "https://somafm.com/dronezone.pls"
+    metadata:
+      type: none
+
+  # World / Reggae / Divers
+  - id: radioparadiseworld
+    name: "Radio Paradise World/Etc"
+    stream_urls:
+      - "http://stream.radioparadise.com/world-etc-320"
+      - "http://stream.radioparadise.com/world-etc-192"
+    metadata:
+      type: none
+
+  - id: somafmsuburbsofgoa
+    name: "SomaFM Suburbs of Goa"
+    stream_urls:
+      - "https://somafm.com/suburbsofgoa.pls"
+    metadata:
+      type: none
+  # Reggae dédié : pas de candidat fiable confirmé à ce stade - à compléter.

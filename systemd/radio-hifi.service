@@ -1,0 +1,15 @@
+[Unit]
+Description=Lecteur radio web HiFi (LCD + encodeurs)
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=matthieu
+WorkingDirectory=/home/matthieu/projects/pi-radio-player-hifi
+ExecStart=/home/matthieu/projects/pi-radio-player-hifi/.venv/bin/python3 -m radio.main
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
