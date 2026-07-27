@@ -12,17 +12,20 @@ LCD_I2C_ADDRESS = 0x27
 LCD_COLS = 16
 LCD_ROWS = 2
 
-# GPIO réservés par le HAT InnoMaker DAC Mini (PCM5122) - confirmé par le
-# manuel constructeur (UserManual, tableau §3.2) le 2026-07-27 :
+# GPIO liés au HAT InnoMaker DAC Mini (PCM5122) - confirmé par le manuel
+# constructeur (UserManual, tableau §3.2) le 2026-07-27 :
 #   GPIO2/3   (SDA1/SCL1)  -> I2C du DAC (même bus que le LCD, adresses
 #                             différentes donc pas de conflit)
 #   GPIO18/19/21 (BCLK/LRCLK/DOUT) -> I2S, piloté par le HAT
-#   GPIO6     -> pin de mute du DAC, ACTIVEMENT piloté par le HAT
+#   GPIO6     -> pin de mute : ENTRÉE côté HAT, pilotée en SORTIE depuis le
+#                Pi (cf. HAT_MUTE_PIN plus bas - volontairement utilisée,
+#                pas juste évitée)
 #   GPIO26    -> réservé récepteur IR (non câblé par défaut sur la variante
 #                Mini, mais réservé par le constructeur - on l'évite pour
 #                garder l'option ouverte)
 #   GPIO0/1   (ID_SD/ID_SC) -> réservés HAT EEPROM, convention 40-pin standard
-# Ne JAMAIS réutiliser ces GPIO pour un bouton, une LED ou un encodeur.
+# Ne JAMAIS réutiliser GPIO2/3/18/19/21/26/0/1 pour un bouton, une LED ou un
+# encodeur.
 #
 # Encodeur volume (gpiozero.RotaryEncoder + bouton poussoir intégré).
 VOL_ENCODER_CLK_PIN = 17
@@ -44,9 +47,19 @@ FAVORITE_BUTTON_PINS = [16, 12, 25, 24]
 SHUTDOWN_PIN = 14
 
 # LEDs : "action" (confirmation changement de station / favori),
-# "playing" (allumée pendant la diffusion, clignote au changement de titre).
+# "playing" (allumée pendant la diffusion, clignote au changement de titre,
+# clignote LENTEMENT tant que le mute matériel ci-dessous est actif).
 ACTION_LED_PIN = 23
 PLAYING_LED_PIN = 4
+
+# Mute matériel du HAT InnoMaker DAC Mini : GPIO6 est l'entrée de contrôle
+# côté HAT (cf. note plus haut), pilotée ici en sortie, basculée par le
+# bouton intégré de l'encodeur volume (VOL_ENCODER_SW_PIN). Polarité (actif
+# haut/bas) NON documentée précisément dans le manuel constructeur - à
+# confirmer une fois le HAT branché (cf. README), la valeur ci-dessous est
+# une hypothèse de départ.
+HAT_MUTE_PIN = 6
+HAT_MUTE_ACTIVE_HIGH = True
 
 # Device ALSA explicite pour mpv. Le HAT InnoMaker DAC Mini apparaît en tant
 # que carte "BossDAC" une fois l'overlay chargé (cf. `aplay -l` /

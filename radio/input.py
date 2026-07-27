@@ -11,27 +11,22 @@ log = logging.getLogger(__name__)
 
 class VolumeEncoder:
     """Rotation = +/- `step` % de volume (clampé 0-100). Le bouton intégré
-    fait office de mute/unmute (appui court, bascule)."""
+    bascule le mute matériel du HAT (cf. audio.HatMute), indépendant du
+    volume logiciel mpv."""
 
-    def __init__(self, clk_pin: int, dt_pin: int, sw_pin: int, on_change, step: int = 2, initial_percent: int = 50):
+    def __init__(self, clk_pin: int, dt_pin: int, sw_pin: int, on_change, on_toggle_mute, step: int = 2, initial_percent: int = 50):
         self.percent = initial_percent
-        self._muted = False
         self._on_change = on_change
         self._step = step
         self._encoder = RotaryEncoder(clk_pin, dt_pin, bounce_time=0.01)
         self._encoder.when_rotated_clockwise = lambda: self._adjust(self._step)
         self._encoder.when_rotated_counter_clockwise = lambda: self._adjust(-self._step)
         self._button = Button(sw_pin, pull_up=True, bounce_time=0.05)
-        self._button.when_pressed = self._toggle_mute
+        self._button.when_pressed = on_toggle_mute
 
     def _adjust(self, delta: int):
         self.percent = max(0, min(100, self.percent + delta))
-        self._muted = False  # retoucher la molette annule le mute
         self._on_change(self.percent)
-
-    def _toggle_mute(self):
-        self._muted = not self._muted
-        self._on_change(0 if self._muted else self.percent)
 
     def close(self):
         self._encoder.close()

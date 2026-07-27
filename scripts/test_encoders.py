@@ -14,13 +14,26 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from radio import config
+from radio.audio import HatMute
 from radio.input import StationEncoder, VolumeEncoder
+
+hat_mute = HatMute()
+muted = False
+
+
+def on_toggle_mute():
+    global muted
+    muted = not muted
+    hat_mute.set_muted(muted)
+    print(f"[volume] bouton -> mute {'ACTIF' if muted else 'inactif'} (GPIO{config.HAT_MUTE_PIN})")
+
 
 volume = VolumeEncoder(
     config.VOL_ENCODER_CLK_PIN,
     config.VOL_ENCODER_DT_PIN,
     config.VOL_ENCODER_SW_PIN,
     on_change=lambda percent: print(f"[volume] {percent}%"),
+    on_toggle_mute=on_toggle_mute,
 )
 
 station_encoder = StationEncoder(
@@ -44,3 +57,4 @@ except KeyboardInterrupt:
 finally:
     volume.close()
     station_encoder.close()
+    hat_mute.close()

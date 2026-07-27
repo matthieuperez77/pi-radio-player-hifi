@@ -9,7 +9,7 @@ import subprocess
 import threading
 
 from radio import config
-from radio.audio import Player
+from radio.audio import HatMute, Player
 from radio.config import load_stations
 from radio.display import Display
 from radio.input import FavoriteButtons, ShutdownButton, StationEncoder, VolumeEncoder
@@ -38,9 +38,11 @@ class RadioApp:
         self.state = load_state()  # dernier run : station, volume, favoris, préférence LCD
         self.favorites = self.state.get("favorites", {})
         self.lcd_follow_playback = self.state.get("lcd_follow_playback", True)
+        self.muted = False  # jamais persisté : on redémarre toujours démuté
 
         self.player = Player()
         self.player.on_error = self._on_stream_error
+        self.hat_mute = HatMute()
 
         self.display = Display()
         self.display.set_follow_playback(self.lcd_follow_playback)
@@ -54,6 +56,7 @@ class RadioApp:
             config.VOL_ENCODER_DT_PIN,
             config.VOL_ENCODER_SW_PIN,
             self.on_volume_change,
+            self.on_toggle_mute,
             initial_percent=volume_percent,
         )
         self.player.set_volume(self.volume.percent)
@@ -118,6 +121,12 @@ class RadioApp:
         self.player.set_volume(percent)
         save_state(volume_percent=percent)
 
+    def on_toggle_mute(self):
+        self.muted = not self.muted
+        self.hat_mute.set_muted(self.muted)
+        self.leds.set_muted(self.muted)
+        log.info("Mute matériel : %s", "actif" if self.muted else "inactif")
+
     def refresh_metadata(self):
         with self._lock:
             station = self.current_station
@@ -176,6 +185,7 @@ class RadioApp:
         self.shutdown_button.close()
         self.leds.close()
         self.display.sleep()
+        self.hat_mute.close()
         self.player.close()
 
     def on_shutdown_button(self):

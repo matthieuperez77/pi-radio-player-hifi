@@ -13,11 +13,11 @@ dédié, et un choix de stations bien plus large (réseau national Radio France
 |---|---|
 | Carte | Raspberry Pi 3, Debian 13 (Trixie) |
 | Écran | LCD caractères I2C (Qapass, backpack PCF8574), 16x2 par défaut — à ajuster dans `config.py` si finalement 20x4 |
-| Encodeur volume | Rotatif, +/- 2% par cran, bouton intégré = mute/unmute |
+| Encodeur volume | Rotatif, +/- 2% par cran ; bouton intégré = bascule le **mute matériel du HAT** (GPIO6, coupe le son au niveau du DAC, indépendamment du volume logiciel mpv) |
 | Encodeur station | Rotatif façon "tuner vintage" : chaque cran change immédiatement de station et lance la lecture ; bouton intégré (appui long ~1.5s) = bascule LCD actif/éteint pendant l'écoute |
 | Boutons favoris | 4 boutons poussoir : appui court = charge le favori du slot, appui long (~1.2s) = enregistre la station en cours dans le slot |
 | Bouton d'arrêt | 1 bouton poussoir dédié, maintien ~2s → arrêt propre du Raspberry Pi |
-| LEDs | 2 : "action" (flash bref à un changement de station ou une action favori), "lecture" (allumée en continu pendant la diffusion, clignote au changement de titre) |
+| LEDs | 2 : "action" (flash bref à un changement de station ou une action favori), "lecture" (allumée en continu pendant la diffusion, clignote au changement de titre, **clignote lentement en continu tant que le mute est actif**) |
 | Audio | HAT InnoMaker DAC Mini (PCM5122, I2S) |
 
 ## Stations
@@ -75,10 +75,10 @@ changé.
 |---|---|---|
 | I2C (LCD + DAC) | 2 (SDA), 3 (SCL) | Bus **I2C 1** — nécessite `dtparam=i2c_arm=on` (voir Installation) ; partagé avec le HAT InnoMaker (adresses différentes, pas de conflit) |
 | I2S (HAT InnoMaker DAC Mini) | 18 (BCLK), 19 (LRCLK), 21 (DOUT) | piloté par le HAT/overlay, **ne jamais réutiliser** |
-| Mute DAC (HAT InnoMaker) | 6 | activement piloté par le HAT, **ne jamais réutiliser** |
+| Mute DAC (HAT InnoMaker) | 6 | **utilisée volontairement** : entrée côté HAT, pilotée en sortie depuis le Pi par le bouton intégré de l'encodeur volume (cf. `audio.HatMute`) - polarité à confirmer une fois le HAT branché |
 | IR réservé (HAT InnoMaker) | 26 | non câblé par défaut sur la variante Mini mais réservé par le constructeur, **évité par précaution** |
 | ID EEPROM (convention 40-pin) | 0, 1 | jamais utilisable de toute façon |
-| Encodeur volume | 17 (CLK), 27 (DT), 22 (SW) | |
+| Encodeur volume | 17 (CLK), 27 (DT), 22 (SW) | bouton SW = bascule GPIO6 (mute matériel du HAT) |
 | Encodeur station | 5 (CLK), 7 (DT), 13 (SW) | |
 | Favori 1 / 2 / 3 / 4 | 16, 12, 25, 24 | |
 | Bouton d'arrêt | 14 | UART désactivé sur cette machine, GPIO libre |
@@ -147,7 +147,8 @@ sudo systemctl enable --now radio-hifi.service
 Dans `scripts/`, à lancer indépendamment du service pour vérifier le
 câblage au fur et à mesure (voir l'en-tête de chaque fichier) :
 
-- `test_encoders.py` — crans + boutons intégrés des 2 encodeurs
+- `test_encoders.py` — crans + boutons intégrés des 2 encodeurs (dont le
+  mute matériel du HAT sur le bouton de l'encodeur volume)
 - `test_favorite_buttons.py` — appui court/long des 4 boutons favoris
 - `test_leds.py` — LEDs action/lecture
 - `test_shutdown_button.py` — maintien du bouton d'arrêt (simulé, n'éteint pas)
