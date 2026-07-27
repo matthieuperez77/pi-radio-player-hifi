@@ -9,6 +9,7 @@ matériel branché, dans le même esprit que le SimulatedEPD de l'ancien projet.
 
 import logging
 import threading
+import unicodedata
 
 from radio.config import LCD_COLS, LCD_I2C_ADDRESS, LCD_ROWS, I2C_BUS, ROOT
 
@@ -21,9 +22,32 @@ SCROLL_GAP = "   "  # séparateur entre la fin et la reprise du défilement en b
 ERROR_CYCLE_SECONDS = 3.0
 BACKLIGHT_GRACE_SECONDS = 4.0  # délai avant extinction si "LCD éteint pendant l'écoute"
 
+_LIGATURES = {"œ": "oe", "Œ": "OE", "æ": "ae", "Æ": "AE"}
+_PUNCTUATION = {
+    "’": "'", "‘": "'", "“": '"', "”": '"',
+    "«": '"', "»": '"', "–": "-", "—": "-",
+}
+
+
+def _strip_accents(text: str) -> str:
+    """Translittère en ASCII pur (é->e, ç->c, œ->oe...).
+
+    La ROM du contrôleur HD44780 réellement câblé ne correspond ni à la
+    table A02 (RPLCD, par défaut) ni à la table A00 : les caractères
+    accentués s'affichent comme des glyphes erronés dans les deux cas
+    (constaté au test le 2026-07-27). On évite donc d'envoyer au LCD tout
+    caractère hors ASCII plutôt que de dépendre d'une table qui ne
+    correspond pas au matériel.
+    """
+    for src, dst in {**_LIGATURES, **_PUNCTUATION}.items():
+        text = text.replace(src, dst)
+    nfkd = unicodedata.normalize("NFKD", text)
+    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
+    return stripped.encode("ascii", "replace").decode("ascii")
+
 
 def _pad(text: str, width: int = LCD_COLS) -> str:
-    return text[:width].ljust(width)
+    return _strip_accents(text)[:width].ljust(width)
 
 
 class SimulatedLCD:
@@ -203,7 +227,7 @@ class Display:
         self._stop_ticker()
         stop = threading.Event()
         self._ticker_stop = stop
-        looped = text + SCROLL_GAP
+        looped = _strip_accents(text) + SCROLL_GAP
 
         def loop():
             offset = 0

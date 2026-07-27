@@ -27,7 +27,7 @@ refresh_interval_seconds: 600
 stations:
   # --- Radio France : réseau national (généralistes) ------------------------
   - id: franceinter
-    name: "France Inter"
+    name: "F. Inter"
     stream_urls:
       - "https://icecast.radiofrance.fr/franceinter-hifi.aac?id=radiofrance"
       - "https://icecast.radiofrance.fr/franceinter-midfi.mp3?id=radiofrance"
@@ -36,7 +36,7 @@ stations:
       type: none
 
   - id: franceinfo
-    name: "France Info"
+    name: "F. Info"
     stream_urls:
       - "https://icecast.radiofrance.fr/franceinfo-hifi.aac?id=radiofrance"
       - "https://icecast.radiofrance.fr/franceinfo-midfi.mp3?id=radiofrance"
@@ -45,7 +45,7 @@ stations:
       type: none
 
   - id: franceculture
-    name: "France Culture"
+    name: "F. Culture"
     stream_urls:
       - "https://icecast.radiofrance.fr/franceculture-hifi.aac?id=radiofrance"
       - "https://icecast.radiofrance.fr/franceculture-midfi.mp3?id=radiofrance"
@@ -66,7 +66,7 @@ stations:
 
   # --- France Musique + webradios thématiques --------------------------------
   - id: francemusique
-    name: "France Musique"
+    name: "F. Musique"
     stream_urls:
       - "https://icecast.radiofrance.fr/francemusique-hifi.aac?id=radiofrance"
       - "https://icecast.radiofrance.fr/francemusique-midfi.mp3?id=radiofrance"
