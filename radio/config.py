@@ -12,9 +12,17 @@ LCD_I2C_ADDRESS = 0x27
 LCD_COLS = 16
 LCD_ROWS = 2
 
-# GPIO18/19/20/21 (BCLK/LRCLK/DIN/DOUT) sont réservés à l'I2S du HAT audio
-# InnoMaker DAC Mini (PCM5122) - ne JAMAIS les réutiliser pour un bouton, une
-# LED ou un encodeur, même libres côté logiciel.
+# GPIO réservés par le HAT InnoMaker DAC Mini (PCM5122) - confirmé par le
+# manuel constructeur (UserManual, tableau §3.2) le 2026-07-27 :
+#   GPIO2/3   (SDA1/SCL1)  -> I2C du DAC (même bus que le LCD, adresses
+#                             différentes donc pas de conflit)
+#   GPIO18/19/21 (BCLK/LRCLK/DOUT) -> I2S, piloté par le HAT
+#   GPIO6     -> pin de mute du DAC, ACTIVEMENT piloté par le HAT
+#   GPIO26    -> réservé récepteur IR (non câblé par défaut sur la variante
+#                Mini, mais réservé par le constructeur - on l'évite pour
+#                garder l'option ouverte)
+#   GPIO0/1   (ID_SD/ID_SC) -> réservés HAT EEPROM, convention 40-pin standard
+# Ne JAMAIS réutiliser ces GPIO pour un bouton, une LED ou un encodeur.
 #
 # Encodeur volume (gpiozero.RotaryEncoder + bouton poussoir intégré).
 VOL_ENCODER_CLK_PIN = 17
@@ -24,7 +32,7 @@ VOL_ENCODER_SW_PIN = 22
 # Encodeur de changement de station, façon "tuner" (cf. StationEncoder).
 # Le bouton intégré sert au bascule LCD actif/éteint pendant l'écoute.
 STATION_ENCODER_CLK_PIN = 5
-STATION_ENCODER_DT_PIN = 6
+STATION_ENCODER_DT_PIN = 7
 STATION_ENCODER_SW_PIN = 13
 
 # 4 boutons favoris (appui court = charger, appui long = enregistrer),
@@ -38,11 +46,13 @@ SHUTDOWN_PIN = 14
 # LEDs : "action" (confirmation changement de station / favori),
 # "playing" (allumée pendant la diffusion, clignote au changement de titre).
 ACTION_LED_PIN = 23
-PLAYING_LED_PIN = 26
+PLAYING_LED_PIN = 4
 
-# Device ALSA explicite pour mpv (ex. "alsa/hw:CARD=sndrpihifiberry,DEV=0"),
-# à renseigner seulement si la carte InnoMaker n'est pas le device par défaut
-# du système (cf. `aplay -l`). None = laisse mpv/ALSA choisir le défaut.
+# Device ALSA explicite pour mpv. Le HAT InnoMaker DAC Mini apparaît en tant
+# que carte "BossDAC" une fois l'overlay chargé (cf. `aplay -l` /
+# `cat /proc/asound/cards`), ex. "alsa/hw:CARD=BossDAC,DEV=0" - à renseigner
+# seulement si ce n'est pas le device par défaut du système.
+# None = laisse mpv/ALSA choisir le défaut.
 AUDIO_DEVICE = None
 
 

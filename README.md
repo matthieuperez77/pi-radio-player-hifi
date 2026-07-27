@@ -73,17 +73,24 @@ changé.
 
 | Fonction | GPIO | Notes |
 |---|---|---|
-| I2C (LCD) | 2 (SDA), 3 (SCL) | Bus **I2C 1** — nécessite `dtparam=i2c_arm=on` (voir Installation) |
-| I2S (HAT InnoMaker DAC Mini) | 18, 19, 20, 21 | piloté par le HAT/overlay, **ne jamais réutiliser** ces GPIO pour un bouton/LED/encodeur |
+| I2C (LCD + DAC) | 2 (SDA), 3 (SCL) | Bus **I2C 1** — nécessite `dtparam=i2c_arm=on` (voir Installation) ; partagé avec le HAT InnoMaker (adresses différentes, pas de conflit) |
+| I2S (HAT InnoMaker DAC Mini) | 18 (BCLK), 19 (LRCLK), 21 (DOUT) | piloté par le HAT/overlay, **ne jamais réutiliser** |
+| Mute DAC (HAT InnoMaker) | 6 | activement piloté par le HAT, **ne jamais réutiliser** |
+| IR réservé (HAT InnoMaker) | 26 | non câblé par défaut sur la variante Mini mais réservé par le constructeur, **évité par précaution** |
+| ID EEPROM (convention 40-pin) | 0, 1 | jamais utilisable de toute façon |
 | Encodeur volume | 17 (CLK), 27 (DT), 22 (SW) | |
-| Encodeur station | 5 (CLK), 6 (DT), 13 (SW) | |
+| Encodeur station | 5 (CLK), 7 (DT), 13 (SW) | |
 | Favori 1 / 2 / 3 / 4 | 16, 12, 25, 24 | |
 | Bouton d'arrêt | 14 | UART désactivé sur cette machine, GPIO libre |
 | LED action | 23 | |
-| LED lecture | 26 | |
+| LED lecture | 4 | |
 
 Tous les pins ci-dessus sont des valeurs de départ dans `config.py` — à
-ajuster si le câblage réel diffère (aucune autre logique n'en dépend).
+ajuster si le câblage réel diffère (aucune autre logique n'en dépend). Les
+lignes I2C/I2S/Mute/IR/ID EEPROM viennent du manuel constructeur InnoMaker
+(UserManual §3.2, vérifié le 2026-07-27) : **conflit réel détecté et corrigé**
+sur GPIO6 (mute) et GPIO26 (IR), initialement assignés par erreur à
+l'encodeur station et à la LED lecture avant cette vérification.
 
 ## Installation
 
@@ -92,11 +99,13 @@ Constaté sur le Raspberry Pi cible le 2026-07-27, avant câblage :
 - `/dev/i2c-2` existe déjà mais n'est câblé à rien (comme sur le premier Pi) ;
   `dtparam=i2c_arm=on` est **commenté** dans `/boot/firmware/config.txt` →
   à décommenter pour activer le bus I2C 1 (GPIO2/3, utilisé par le LCD).
-- `dtparam=i2s=on` est **commenté** → à décommenter pour le HAT InnoMaker
-  DAC Mini (PCM5122), en plus de l'overlay du DAC lui-même (probablement
-  `dtoverlay=hifiberry-dac`, chip compatible - **à confirmer auprès de la
-  documentation InnoMaker avant de figer**, puis noter le résultat ici une
-  fois validé sur le matériel).
+- Overlay du DAC **confirmé par le manuel constructeur InnoMaker**
+  (UserManual §4.8, DAC/DAC Mini partagent le même manuel) :
+  `dtoverlay=allo-boss-dac-pcm512x-audio` (carte compatible Allo Boss DAC,
+  même puce PCM512x) - apparaît ensuite comme carte ALSA **"BossDAC"**. Le
+  manuel constructeur n'ajoute pas de `dtparam=i2s=on` séparé (l'overlay
+  suffit dans leur procédure testée) ; à essayer en secours seulement si le
+  son ne sort pas après reboot.
 - `mpv` n'est pas installé (`apt install mpv`).
 - Un redémarrage est nécessaire après modification de `config.txt`.
 
@@ -105,7 +114,7 @@ Constaté sur le Raspberry Pi cible le 2026-07-27, avant câblage :
 ```bash
 sudo apt install mpv i2c-tools
 sudo raspi-config nonint do_i2c 0   # ou décommenter dtparam=i2c_arm=on à la main
-# ajouter dtparam=i2s=on + dtoverlay=hifiberry-dac (à confirmer) dans /boot/firmware/config.txt
+# ajouter dtoverlay=allo-boss-dac-pcm512x-audio dans /boot/firmware/config.txt
 sudo reboot
 
 # après redémarrage : vérifier l'adresse I2C du LCD (0x27 le plus courant,
