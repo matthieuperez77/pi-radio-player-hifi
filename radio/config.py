@@ -17,9 +17,12 @@ LCD_ROWS = 2
 #   GPIO2/3   (SDA1/SCL1)  -> I2C du DAC (même bus que le LCD, adresses
 #                             différentes donc pas de conflit)
 #   GPIO18/19/21 (BCLK/LRCLK/DOUT) -> I2S, piloté par le HAT
-#   GPIO6     -> pin de mute : ENTRÉE côté HAT, pilotée en SORTIE depuis le
-#                Pi (cf. HAT_MUTE_PIN plus bas - volontairement utilisée,
-#                pas juste évitée)
+#   GPIO6     -> pin de mute côté HAT, déjà revendiqué par le kernel au
+#                démarrage via le dtoverlay allo-boss-dac-pcm512x-audio
+#                (confirmé par `gpioinfo` le 2026-07-30, consumer="mute") -
+#                on ne le pilote PAS depuis l'appli (mute géré en logiciel
+#                côté mpv, cf. RadioApp.on_toggle_mute), on l'évite juste
+#                pour ne pas rentrer en conflit avec le driver noyau
 #   GPIO26    -> réservé récepteur IR (non câblé par défaut sur la variante
 #                Mini, mais réservé par le constructeur - on l'évite pour
 #                garder l'option ouverte)
@@ -48,25 +51,17 @@ SHUTDOWN_PIN = 14
 
 # LEDs : "action" (confirmation changement de station / favori),
 # "playing" (allumée pendant la diffusion, clignote au changement de titre,
-# clignote LENTEMENT tant que le mute matériel ci-dessous est actif).
+# clignote LENTEMENT tant que le mute (cf. RadioApp.on_toggle_mute) est actif).
 ACTION_LED_PIN = 23
 PLAYING_LED_PIN = 4
 
-# Mute matériel du HAT InnoMaker DAC Mini : GPIO6 est l'entrée de contrôle
-# côté HAT (cf. note plus haut), pilotée ici en sortie, basculée par le
-# bouton intégré de l'encodeur volume (VOL_ENCODER_SW_PIN). Polarité (actif
-# haut/bas) NON documentée précisément dans le manuel constructeur - à
-# confirmer une fois le HAT branché (cf. README), la valeur ci-dessous est
-# une hypothèse de départ.
-HAT_MUTE_PIN = 6
-HAT_MUTE_ACTIVE_HIGH = True
-
 # Device ALSA explicite pour mpv. Le HAT InnoMaker DAC Mini apparaît en tant
-# que carte "BossDAC" une fois l'overlay chargé (cf. `aplay -l` /
-# `cat /proc/asound/cards`), ex. "alsa/hw:CARD=BossDAC,DEV=0" - à renseigner
-# seulement si ce n'est pas le device par défaut du système.
-# None = laisse mpv/ALSA choisir le défaut.
-AUDIO_DEVICE = None
+# que carte "BossDAC" une fois l'overlay chargé (confirmé par `aplay -l` /
+# `cat /proc/asound/cards` le 2026-07-30, carte 2). Nécessaire : sans ça,
+# mpv/ALSA route vers le jack analogique intégré du Pi (carte 1, "bcm2835
+# Headphones") plutôt que le HAT, avec un grésillement caractéristique du
+# petit DAC PWM du Pi (constaté le 2026-07-30).
+AUDIO_DEVICE = "alsa/hw:CARD=BossDAC,DEV=0"
 
 
 def load_stations():

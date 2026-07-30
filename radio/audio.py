@@ -12,9 +12,7 @@ import subprocess
 import threading
 import time
 
-from gpiozero import OutputDevice
-
-from radio.config import AUDIO_DEVICE, HAT_MUTE_ACTIVE_HIGH, HAT_MUTE_PIN, ROOT
+from radio.config import AUDIO_DEVICE, ROOT
 
 log = logging.getLogger(__name__)
 
@@ -105,20 +103,3 @@ class Player:
         except OSError:
             pass
         self._proc.wait(timeout=5)
-
-
-class HatMute:
-    """Pilote le pin de mute matériel du HAT InnoMaker DAC Mini (GPIO6) :
-    une entrée côté HAT qui coupe le son au niveau du DAC, indépendamment
-    du volume logiciel mpv. Polarité (HAT_MUTE_ACTIVE_HIGH) non documentée
-    précisément par le constructeur - à confirmer une fois le HAT branché
-    (cf. README) ; sans conséquence tant que rien n'est câblé sur ce GPIO."""
-
-    def __init__(self):
-        self._output = OutputDevice(HAT_MUTE_PIN, active_high=HAT_MUTE_ACTIVE_HIGH, initial_value=False)
-
-    def set_muted(self, muted: bool):
-        self._output.value = muted
-
-    def close(self):
-        self._output.close()

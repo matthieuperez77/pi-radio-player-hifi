@@ -14,18 +14,18 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from radio import config
-from radio.audio import HatMute
 from radio.input import StationEncoder, VolumeEncoder
 
-hat_mute = HatMute()
+# Le mute reel (mise a 0/restauration du volume mpv, cf. RadioApp) depend
+# du Player, absent de ce script bas niveau : on se contente d'afficher le
+# toggle pour verifier le bouton.
 muted = False
 
 
 def on_toggle_mute():
     global muted
     muted = not muted
-    hat_mute.set_muted(muted)
-    print(f"[volume] bouton -> mute {'ACTIF' if muted else 'inactif'} (GPIO{config.HAT_MUTE_PIN})")
+    print(f"[volume] bouton -> mute {'ACTIF' if muted else 'inactif'}")
 
 
 volume = VolumeEncoder(
@@ -57,4 +57,3 @@ except KeyboardInterrupt:
 finally:
     volume.close()
     station_encoder.close()
-    hat_mute.close()

@@ -19,4 +19,5 @@ def get_local_ip() -> str | None:
 
 
 def get_username() -> str:
-    return getpass.getuser()
+    """':: ' en suffixe sert de pense-bête visuel pour le mot de passe."""
+    return f"{getpass.getuser()}::"

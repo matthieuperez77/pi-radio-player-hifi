@@ -11,8 +11,8 @@ log = logging.getLogger(__name__)
 
 class VolumeEncoder:
     """Rotation = +/- `step` % de volume (clampé 0-100). Le bouton intégré
-    bascule le mute matériel du HAT (cf. audio.HatMute), indépendant du
-    volume logiciel mpv."""
+    bascule le mute (cf. RadioApp.on_toggle_mute) : volume mpv mis à 0 sur
+    un appui, restauré au niveau précédent sur le suivant."""
 
     def __init__(self, clk_pin: int, dt_pin: int, sw_pin: int, on_change, on_toggle_mute, step: int = 2, initial_percent: int = 50):
         self.percent = initial_percent

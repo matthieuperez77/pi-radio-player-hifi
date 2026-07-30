@@ -9,7 +9,7 @@ import subprocess
 import threading
 
 from radio import config
-from radio.audio import HatMute, Player
+from radio.audio import Player
 from radio.config import load_stations
 from radio.display import Display
 from radio.input import FavoriteButtons, ShutdownButton, StationEncoder, VolumeEncoder
@@ -42,7 +42,6 @@ class RadioApp:
 
         self.player = Player()
         self.player.on_error = self._on_stream_error
-        self.hat_mute = HatMute()
 
         self.display = Display()
         self.display.set_follow_playback(self.lcd_follow_playback)
@@ -57,6 +56,7 @@ class RadioApp:
             config.VOL_ENCODER_SW_PIN,
             self.on_volume_change,
             self.on_toggle_mute,
+            step=1,
             initial_percent=volume_percent,
         )
         self.player.set_volume(self.volume.percent)
@@ -116,16 +116,27 @@ class RadioApp:
         self.display.set_follow_playback(self.lcd_follow_playback)
         save_state(lcd_follow_playback=self.lcd_follow_playback)
         log.info("LCD pendant l'écoute : %s", "actif" if self.lcd_follow_playback else "éteint")
+        with self._lock:
+            station = self.current_station
+        if station is None:
+            return
+        if self.lcd_follow_playback:
+            self.display.show_now_playing(station, self.shown_emission_text)
+        else:
+            self.display.show_station(station)  # relance le minuteur d'extinction
 
     def on_volume_change(self, percent: int):
+        if self.muted:
+            self.muted = False
+            self.leds.set_muted(False)
         self.player.set_volume(percent)
         save_state(volume_percent=percent)
 
     def on_toggle_mute(self):
         self.muted = not self.muted
-        self.hat_mute.set_muted(self.muted)
+        self.player.set_volume(0 if self.muted else self.volume.percent)
         self.leds.set_muted(self.muted)
-        log.info("Mute matériel : %s", "actif" if self.muted else "inactif")
+        log.info("Mute : %s", "actif" if self.muted else "inactif")
 
     def refresh_metadata(self):
         with self._lock:
@@ -185,7 +196,6 @@ class RadioApp:
         self.shutdown_button.close()
         self.leds.close()
         self.display.sleep()
-        self.hat_mute.close()
         self.player.close()
 
     def on_shutdown_button(self):

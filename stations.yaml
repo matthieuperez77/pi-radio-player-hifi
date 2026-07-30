@@ -16,7 +16,7 @@
 #     none                  -> pas de métadonnée disponible (LCD : nom de
 #                             station seul)
 
-refresh_interval_seconds: 600
+refresh_interval_seconds: 30
 
 # Pour trouver le station_id manquant d'une chaîne Radio France : essayer
 # https://api.radiofrance.fr/livemeta/pull/<id> avec de petits entiers et
