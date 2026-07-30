@@ -15,7 +15,7 @@ dédié, et un choix de stations bien plus large (réseau national Radio France
 | Écran | LCD caractères I2C (Qapass, backpack PCF8574), 16x2 par défaut — à ajuster dans `config.py` si finalement 20x4 |
 | Encodeur volume | Rotatif, +/- 2% par cran ; bouton intégré = bascule le **mute matériel du HAT** (GPIO6, coupe le son au niveau du DAC, indépendamment du volume logiciel mpv) |
 | Encodeur station | Rotatif façon "tuner vintage" : chaque cran change immédiatement de station et lance la lecture ; bouton intégré (appui long ~1.5s) = bascule LCD actif/éteint pendant l'écoute |
-| Boutons favoris | 4 boutons poussoir : appui court = charge le favori du slot, appui long (~1.2s) = enregistre la station en cours dans le slot |
+| Boutons favoris | 10 boutons poussoir : appui court = charge le favori du slot, appui long (~1.2s) = enregistre la station en cours dans le slot |
 | Bouton d'arrêt | 1 bouton poussoir dédié, maintien ~2s → arrêt propre du Raspberry Pi |
 | LEDs | 2 : "action" (flash bref à un changement de station ou une action favori), "lecture" (allumée en continu pendant la diffusion, clignote au changement de titre, **clignote lentement en continu tant que le mute est actif**) |
 | Audio | HAT InnoMaker DAC Mini (PCM5122, I2S) |
@@ -151,7 +151,7 @@ câblage au fur et à mesure (voir l'en-tête de chaque fichier) :
 
 - `test_encoders.py` — crans + boutons intégrés des 2 encodeurs (dont le
   mute matériel du HAT sur le bouton de l'encodeur volume)
-- `test_favorite_buttons.py` — appui court/long des 4 boutons favoris
+- `test_favorite_buttons.py` — appui court/long des 10 boutons favoris
 - `test_leds.py` — LEDs action/lecture
 - `test_shutdown_button.py` — maintien du bouton d'arrêt (simulé, n'éteint pas)
 - `test_lcd.py` — enchaîne tous les écrans (boot, station, now playing avec

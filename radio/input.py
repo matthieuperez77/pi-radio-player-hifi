@@ -1,5 +1,5 @@
 """Entrées physiques : deux encodeurs rotatifs (volume, changement de
-station façon "tuner"), 4 boutons favoris (appui court/long) et le bouton
+station façon "tuner"), des boutons favoris (appui court/long) et le bouton
 d'arrêt propre, repris tel quel de l'ancien projet."""
 
 import logging

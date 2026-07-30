@@ -1,4 +1,4 @@
-"""Test bas niveau des 4 boutons favoris : affiche "chargement" sur appui
+"""Test bas niveau des boutons favoris : affiche "chargement" sur appui
 court et "enregistrement" sur appui long (~1.2s), pour vérifier chaque
 connexion sans dépendre du reste de l'appli (pas d'audio, pas d'écran).
 

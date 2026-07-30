@@ -41,9 +41,14 @@ STATION_ENCODER_CLK_PIN = 5
 STATION_ENCODER_DT_PIN = 7
 STATION_ENCODER_SW_PIN = 13
 
-# 4 boutons favoris (appui court = charger, appui long = enregistrer),
-# indexés 1 à 4 dans cet ordre.
-FAVORITE_BUTTON_PINS = [16, 12, 25, 24]
+# 10 boutons favoris (appui court = charger, appui long = enregistrer),
+# indexés 1 à 10 dans cet ordre. Les 6 derniers (8, 9, 10, 11, 15, 20) sont
+# les toutes dernières broches GPIO libres du header 40 broches - plus aucune
+# de côté après ceux-ci (cf. réservations documentées plus haut : I2C, I2S,
+# HAT, encodeurs, arrêt, LEDs). GPIO8-11 libres car SPI0 désactivé
+# (`#dtparam=spi=on` commenté + `dtoverlay=nospi10` dans config.txt), GPIO15
+# libre car UART désactivé (même raison que GPIO14 pour SHUTDOWN_PIN).
+FAVORITE_BUTTON_PINS = [16, 12, 25, 24, 8, 9, 10, 11, 15, 20]
 
 # Bouton d'arrêt propre (maintien ~2s). GPIO14 libre : UART désactivé,
 # repris de l'ancien projet (radio-epaper) où ce choix a été validé.

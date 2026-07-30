@@ -1,7 +1,7 @@
 # Configuration des stations.
 #
 # Schéma (plus de switch_pin/led_pin/logo : la sélection passe par l'encodeur
-# "tuner" + les 4 favoris, et l'écran est un LCD texte, pas de logos) :
+# "tuner" + les favoris, et l'écran est un LCD texte, pas de logos) :
 #   id            -> identifiant interne stable (utilisé pour les favoris/état)
 #   name          -> nom affiché sur le LCD
 #   stream_urls   -> liste ORDONNÉE de flux, du meilleur au plus dégradé ;
