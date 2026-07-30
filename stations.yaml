@@ -238,6 +238,16 @@ stations:
     metadata:
       type: none
 
+  # --- Autres radios françaises (hors Radio France) --------------------------
+  - id: radionova
+    name: "Radio Nova"
+    stream_urls:
+      - "http://radionova.ice.infomaniak.ch/radionova-256.aac"
+    metadata:
+      # Pas d'API de métadonnées connue (repris du projet e-paper : le flux
+      # annonce icy-metaint mais StreamTitle est vide en permanence).
+      type: none
+
   # --- Sélection internationale -----------------------------------------------
   # Services tiers (pas Radio France) : chaque URL ci-dessous est un point de
   # départ confirmé par recherche mais À VALIDER avec mpv sur le matériel réel
@@ -257,6 +267,14 @@ stations:
     stream_urls:
       - "http://www.radioswissclassic.ch/live/aacp.m3u"
       - "http://www.radioswissclassic.ch/live/mp3.m3u"
+    metadata:
+      type: none
+
+  - id: radioswisspop
+    name: "Radio Swiss Pop"
+    stream_urls:
+      - "http://www.radioswisspop.ch/live/aacp.m3u"
+      - "http://www.radioswisspop.ch/live/mp3.m3u"
     metadata:
       type: none
 
@@ -291,6 +309,27 @@ stations:
     metadata:
       type: none
 
+  - id: somafmsecretagent
+    name: "SomaFM Secret Agent"
+    stream_urls:
+      - "https://somafm.com/secretagent.pls"
+    metadata:
+      type: none
+
+  - id: kexp
+    name: "KEXP"
+    stream_urls:
+      - "https://kexp-mp3-128.streamguys1.com/kexp128.mp3"
+    metadata:
+      type: none
+
+  - id: wwoz
+    name: "WWOZ"
+    stream_urls:
+      - "https://wwoz-sc.streamguys1.com/wwoz-hi.mp3"
+    metadata:
+      type: none
+
   # World / Reggae / Divers
   - id: radioparadiseworld
     name: "Radio Paradise World/Etc"
@@ -306,4 +345,167 @@ stations:
       - "https://somafm.com/suburbsofgoa.pls"
     metadata:
       type: none
-  # Reggae dédié : pas de candidat fiable confirmé à ce stade - à compléter.
+
+  - id: somafmreggae
+    name: "SomaFM Reggae"
+    stream_urls:
+      - "https://somafm.com/reggae.pls"
+      - "https://ice6.somafm.com/reggae-256-mp3"
+    metadata:
+      type: none
+
+  # --- Allemagne ---------------------------------------------------------------
+  - id: radioeins
+    name: "Radio Eins"
+    stream_urls:
+      - "https://dispatcher.rndfnk.com/rbb/radioeins/live/mp3/mid"
+    metadata:
+      type: none
+
+  - id: einslive
+    name: "1LIVE"
+    stream_urls:
+      - "http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3"
+    metadata:
+      type: none
+
+  - id: egofm
+    name: "egoFM"
+    stream_urls:
+      - "http://cast.egofm.de/egofm.mp3"
+    metadata:
+      type: none
+
+  - id: bytefm
+    name: "Byte.fm"
+    stream_urls:
+      - "https://streams.byte.fm/live/mp3-128/"
+    metadata:
+      type: none
+
+  - id: brklassik
+    name: "BR-Klassik"
+    stream_urls:
+      - "https://dispatcher.rndfnk.com/br/brklassik/live/mp3/high"
+    metadata:
+      type: none
+
+  # --- Amérique latine -----------------------------------------------------
+  - id: bossajazzbrasil
+    name: "Bossa Jazz Brasil"
+    stream_urls:
+      - "https://centova5.transmissaodigital.com:20104/live"
+    metadata:
+      type: none
+
+  - id: la2x4
+    name: "La 2x4 (Tango)"
+    stream_urls:
+      - "https://media.radios.ar:9270/"
+    metadata:
+      type: none
+
+  - id: topsalsaradio
+    name: "Top Salsa Radio"
+    stream_urls:
+      - "https://radio.dominiserver.com/proxy/topsalsaradio?mp=/stream"
+    metadata:
+      type: none
+
+  - id: olimpicastereomedellin
+    name: "Olimpica Stereo"
+    stream_urls:
+      - "https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_MEDELLINAAC.aac"
+    metadata:
+      type: none
+
+  # --- Flamenco ------------------------------------------------------------
+  - id: flamencoradiortva
+    name: "Flamenco Radio"
+    stream_urls:
+      - "https://rtva-live-radio.flumotion.com/rtva/flamenco.mp3"
+    metadata:
+      type: none
+
+  - id: latchoflamenco
+    name: "Latcho Flamenco"
+    stream_urls:
+      - "https://listen.radioking.com/radio/109486/stream/148513"
+    metadata:
+      type: none
+
+  # --- Inde / Tibet / Zen -------------------------------------------------
+  - id: calmradiotibet
+    name: "Calm Radio Tibet"
+    stream_urls:
+      - "https://streams.calmradio.com:6528/stream"
+    metadata:
+      type: none
+
+  - id: calmradiozen
+    name: "Calm Radio Zen"
+    stream_urls:
+      - "http://streams.calmradio.com:14028/stream/1/"
+    metadata:
+      type: none
+
+  - id: radiosaibhajan
+    name: "Radio Sai Bhajan"
+    stream_urls:
+      - "http://stream.radiosai.net:8000/"
+    metadata:
+      type: none
+
+  - id: airraagam
+    name: "AIR Raagam"
+    # Flux HLS (.m3u8), format different des autres stations (icecast direct)
+    # mais lu nativement par mpv sans configuration supplémentaire.
+    stream_urls:
+      - "https://airhlspush.pc.cdn.bitgravity.com/httppush/hlspbaudioragam/hlspbaudioragam_Auto.m3u8"
+    metadata:
+      type: none
+
+  # --- Italie --------------------------------------------------------------
+  - id: rairadio3
+    name: "Rai Radio 3"
+    stream_urls:
+      - "http://icestreaming.rai.it/3.mp3"
+    metadata:
+      type: none
+
+  - id: virginradioclassicrock
+    name: "Virgin Radio Classic Rock"
+    stream_urls:
+      - "http://icy.unitedradio.it/VirginRockClassics.mp3"
+    metadata:
+      type: none
+
+  - id: rmcradiomontecarlo
+    name: "RMC Monte Carlo"
+    stream_urls:
+      - "http://icecast.unitedradio.it/RMC.mp3"
+    metadata:
+      type: none
+
+  - id: radioitaliasmi
+    name: "Radio Italia SMI"
+    # Flux HLS (.m3u8), comme AIR Raagam plus haut.
+    stream_urls:
+      - "https://radioitaliasmi.akamaized.net/hls/live/2093120/RISMI/stream01/streamPlaylist.m3u8"
+    metadata:
+      type: none
+
+  # --- Bretagne --------------------------------------------------------------
+  - id: canalbreizh
+    name: "Canal Breizh"
+    stream_urls:
+      - "http://cast.canalbreizh.bzh/canalbreizh-hd-mp3"
+    metadata:
+      type: none
+
+  - id: radiokreizbreizh
+    name: "Radio Kreiz Breizh"
+    stream_urls:
+      - "https://stream.radios.bzh/listen/rkb/radio.mp3"
+    metadata:
+      type: none
