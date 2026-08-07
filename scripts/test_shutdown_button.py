@@ -1,5 +1,5 @@
 """Test bas niveau du bouton d'arrêt : affiche un message quand un maintien
-~2s est détecté, au lieu de vraiment éteindre le Pi. Permet de vérifier le
+~0.5s est détecté, au lieu de vraiment éteindre le Pi. Permet de vérifier le
 câblage sans devoir relancer la session à chaque essai.
 
 Usage : python3 scripts/test_shutdown_button.py
@@ -21,7 +21,7 @@ def on_shutdown():
 
 
 button = ShutdownButton(SHUTDOWN_PIN, on_shutdown)
-print(f"bouton d'arrêt surveillé sur GPIO{SHUTDOWN_PIN}, maintiens ~2s (Ctrl+C pour arrêter)")
+print(f"bouton d'arrêt surveillé sur GPIO{SHUTDOWN_PIN}, maintiens ~0.5s (Ctrl+C pour arrêter)")
 
 try:
     while True:

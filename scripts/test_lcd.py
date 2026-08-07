@@ -5,6 +5,7 @@ visuelle rapide, sur le vrai LCD ou en simulation (var/preview/lcd.txt).
 Usage : python3 scripts/test_lcd.py
 """
 
+import getpass
 import sys
 import time
 from pathlib import Path
@@ -12,6 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from radio.display import Display
+from radio.sysinfo import get_local_ip
 
 FAKE_STATION = {"name": "France Musique La Jazz"}
 
@@ -35,7 +37,7 @@ display.show_now_playing(FAKE_STATION, "Un très long titre d'émission qui ne t
 time.sleep(6)
 
 print("5. erreur")
-display.show_error(FAKE_STATION["name"], "Flux injoignable", "192.168.1.42", "matthieu")
+display.show_error(FAKE_STATION["name"], "Flux injoignable", get_local_ip(), getpass.getuser())
 time.sleep(8)
 
 print("6. extinction")

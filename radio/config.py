@@ -50,7 +50,7 @@ STATION_ENCODER_SW_PIN = 13
 # libre car UART désactivé (même raison que GPIO14 pour SHUTDOWN_PIN).
 FAVORITE_BUTTON_PINS = [16, 12, 25, 24, 8, 9, 10, 11, 15, 20]
 
-# Bouton d'arrêt propre (maintien ~2s). GPIO14 libre : UART désactivé,
+# Bouton d'arrêt propre (maintien ~0.5s). GPIO14 libre : UART désactivé,
 # repris de l'ancien projet (radio-epaper) où ce choix a été validé.
 SHUTDOWN_PIN = 14
 

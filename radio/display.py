@@ -152,18 +152,25 @@ class Display:
         self._render_static(["Démarrage...", ""])
         self.set_backlight(True)
 
-    def show_station(self, station: dict):
+    def show_station(self, station: dict, grace_seconds: float | None = None):
         """Nom de station affiché immédiatement à la sélection - toujours
         rendu, rétroéclairage réveillé, indépendamment du réglage
         "LCD éteint pendant l'écoute". Si ce réglage est actif, le
-        rétroéclairage s'éteindra tout seul après un court délai de grâce."""
+        rétroéclairage s'éteint après `grace_seconds` (par défaut
+        BACKLIGHT_GRACE_SECONDS ; 0 = immédiat, utilisé quand l'utilisateur
+        vient d'appuyer sur le bouton pour éteindre l'écran lui-même - pas
+        de raison de temporiser dans ce cas précis)."""
         self._cancel_pending()
         self._render_static([station["name"], ""])
         self.set_backlight(True)
         if not self.follow_playback:
-            self._grace_timer = threading.Timer(BACKLIGHT_GRACE_SECONDS, lambda: self.set_backlight(False))
-            self._grace_timer.daemon = True
-            self._grace_timer.start()
+            delay = BACKLIGHT_GRACE_SECONDS if grace_seconds is None else grace_seconds
+            if delay <= 0:
+                self.set_backlight(False)
+            else:
+                self._grace_timer = threading.Timer(delay, lambda: self.set_backlight(False))
+                self._grace_timer.daemon = True
+                self._grace_timer.start()
 
     def show_now_playing(self, station: dict, emission_text: str | None):
         """Appelé au refresh métadonnées périodique. N'a d'effet que si le

@@ -5,9 +5,9 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=matthieu
-WorkingDirectory=/home/matthieu/projects/pi-radio-player-hifi
-ExecStart=/home/matthieu/projects/pi-radio-player-hifi/.venv/bin/python3 -m radio.main
+User=$USER
+WorkingDirectory=/home/$USER/projects/pi-radio-player-hifi
+ExecStart=/home/$USER/projects/pi-radio-player-hifi/.venv/bin/python3 -m radio.main
 Restart=on-failure
 RestartSec=5
 

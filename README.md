@@ -16,7 +16,7 @@ dédié, et un choix de stations bien plus large (réseau national Radio France
 | Encodeur volume | Rotatif, +/- 2% par cran ; bouton intégré = bascule le **mute matériel du HAT** (GPIO6, coupe le son au niveau du DAC, indépendamment du volume logiciel mpv) |
 | Encodeur station | Rotatif façon "tuner vintage" : chaque cran change immédiatement de station et lance la lecture ; bouton intégré (appui long ~1.5s) = bascule LCD actif/éteint pendant l'écoute |
 | Boutons favoris | 10 boutons poussoir : appui court = charge le favori du slot, appui long (~1.2s) = enregistre la station en cours dans le slot |
-| Bouton d'arrêt | 1 bouton poussoir dédié, maintien ~2s → arrêt propre du Raspberry Pi |
+| Bouton d'arrêt | 1 bouton poussoir dédié, maintien ~0.5s → arrêt propre du Raspberry Pi |
 | LEDs | 2 : "action" (flash bref à un changement de station ou une action favori), "lecture" (allumée en continu pendant la diffusion, clignote au changement de titre, **clignote lentement en continu tant que le mute est actif**) |
 | Audio | HAT InnoMaker DAC Mini (PCM5122, I2S) |
 
@@ -69,28 +69,12 @@ la case en cours n'est lui rafraîchi que périodiquement
 (`refresh_interval_seconds`, 10 min par défaut) et seulement si le texte a
 changé.
 
-## Câblage / GPIO (numérotation BCM)
+## Câblage / GPIO
 
-| Fonction | GPIO | Notes |
-|---|---|---|
-| I2C (LCD + DAC) | 2 (SDA), 3 (SCL) | Bus **I2C 1** — nécessite `dtparam=i2c_arm=on` (voir Installation) ; partagé avec le HAT InnoMaker (adresses différentes, pas de conflit) |
-| I2S (HAT InnoMaker DAC Mini) | 18 (BCLK), 19 (LRCLK), 21 (DOUT) | piloté par le HAT/overlay, **ne jamais réutiliser** |
-| Mute DAC (HAT InnoMaker) | 6 | **utilisée volontairement** : entrée côté HAT, pilotée en sortie depuis le Pi par le bouton intégré de l'encodeur volume (cf. `audio.HatMute`) - polarité à confirmer une fois le HAT branché |
-| IR réservé (HAT InnoMaker) | 26 | non câblé par défaut sur la variante Mini mais réservé par le constructeur, **évité par précaution** |
-| ID EEPROM (convention 40-pin) | 0, 1 | jamais utilisable de toute façon |
-| Encodeur volume | 17 (CLK), 27 (DT), 22 (SW) | bouton SW = bascule GPIO6 (mute matériel du HAT) |
-| Encodeur station | 5 (CLK), 7 (DT), 13 (SW) | |
-| Favori 1 / 2 / 3 / 4 | 16, 12, 25, 24 | |
-| Bouton d'arrêt | 14 | UART désactivé sur cette machine, GPIO libre |
-| LED action | 23 | |
-| LED lecture | 4 | |
-
-Tous les pins ci-dessus sont des valeurs de départ dans `config.py` — à
-ajuster si le câblage réel diffère (aucune autre logique n'en dépend). Les
-lignes I2C/I2S/Mute/IR/ID EEPROM viennent du manuel constructeur InnoMaker
-(UserManual §3.2, vérifié le 2026-07-27) : **conflit réel détecté et corrigé**
-sur GPIO6 (mute) et GPIO26 (IR), initialement assignés par erreur à
-l'encodeur station et à la LED lecture avant cette vérification.
+Pinout complet (les 40 broches, numérotation physique et BCM), schéma par
+bloc fonctionnel et notes d'alimentation : voir
+[`docs/CABLAGE.md`](docs/CABLAGE.md). Toutes les valeurs viennent de
+`radio/config.py`, seule source de vérité si le câblage réel diverge.
 
 ## Installation
 
@@ -140,9 +124,14 @@ Lancement manuel (hors systemd, pour valider avant d'installer le service) :
 Puis service systemd :
 
 ```bash
-sudo cp systemd/radio-hifi.service /etc/systemd/system/
+# le unit file utilise le placeholder $USER (utilisateur + chemin du clone) :
+sed "s/\$USER/$(whoami)/g" systemd/radio-hifi.service | sudo tee /etc/systemd/system/radio-hifi.service > /dev/null
+sudo systemctl daemon-reload
 sudo systemctl enable --now radio-hifi.service
 ```
+
+Suppose un clone dans `~/projects/pi-radio-player-hifi` ; adapter
+`WorkingDirectory`/`ExecStart` dans le unit file sinon.
 
 ## Scripts de diagnostic matériel
 

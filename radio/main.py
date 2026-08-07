@@ -123,7 +123,8 @@ class RadioApp:
         if self.lcd_follow_playback:
             self.display.show_now_playing(station, self.shown_emission_text)
         else:
-            self.display.show_station(station)  # relance le minuteur d'extinction
+            # extinction volontaire par l'utilisateur : immédiate, sans délai de grâce
+            self.display.show_station(station, grace_seconds=0)
 
     def on_volume_change(self, percent: int):
         if self.muted:
@@ -199,7 +200,7 @@ class RadioApp:
         self.player.close()
 
     def on_shutdown_button(self):
-        """Bouton d'arrêt maintenu ~2s : affiche l'écran d'extinction puis
+        """Bouton d'arrêt maintenu ~0.5s : affiche l'écran d'extinction puis
         éteint le Raspberry Pi. Le reste du nettoyage (GPIO/audio) est fait
         par `shutdown()`, appelé normalement via SIGTERM quand systemd
         arrête le service pendant l'extinction du système - pas dupliqué ici

@@ -89,11 +89,12 @@ class FavoriteButtons:
 
 
 class ShutdownButton:
-    """Bouton poussoir maintenu ~2s pour déclencher l'arrêt propre du
-    Raspberry Pi (hold_time évite un déclenchement sur un appui accidentel)."""
+    """Bouton poussoir maintenu ~0.5s pour déclencher l'arrêt propre du
+    Raspberry Pi (hold_time évite un déclenchement sur un simple effleurement,
+    sans forcer un maintien long)."""
 
     def __init__(self, pin: int, on_shutdown):
-        self._button = Button(pin, pull_up=True, hold_time=2, bounce_time=0.05)
+        self._button = Button(pin, pull_up=True, hold_time=0.5, bounce_time=0.05)
         self._button.when_held = on_shutdown
 
     def close(self):
