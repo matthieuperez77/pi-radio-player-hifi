@@ -1,0 +1,853 @@
+<title>Construire sa radio Internet — Guide de câblage</title>
+<style>
+  :root{
+    --paper:#EDE9DD;
+    --surface:#F8F6EF;
+    --surface-2:#F1EDE1;
+    --ink:#24241E;
+    --ink-soft:#5B5847;
+    --line:#CFC9B4;
+    --accent:#1F6E52;
+    --accent-soft:#DCE7DF;
+    --copper:#B5651D;
+
+    --c-power:#A93636;
+    --c-gnd: var(--ink-soft);
+    --c-i2c:#6F4F98;
+    --c-hat:#266C82;
+    --c-encvol: var(--copper);
+    --c-encsta:#96751C;
+    --c-fav: var(--accent);
+    --c-led:#9E4270;
+    --c-shutdown:#33538C;
+
+    --shadow: 0 1px 2px rgba(30,26,16,.08), 0 6px 20px -8px rgba(30,26,16,.18);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14170F;
+      --surface:#1B2016;
+      --surface-2:#20261A;
+      --ink:#EDEAE0;
+      --ink-soft:#A8A48F;
+      --line:#333A29;
+      --accent:#57B98C;
+      --accent-soft:#213228;
+      --copper:#D98A46;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 26px -10px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14170F;
+    --surface:#1B2016;
+    --surface-2:#20261A;
+    --ink:#EDEAE0;
+    --ink-soft:#A8A48F;
+    --line:#333A29;
+    --accent:#57B98C;
+    --accent-soft:#213228;
+    --copper:#D98A46;
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 26px -10px rgba(0,0,0,.5);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    font-size:17px;
+    line-height:1.6;
+    text-rendering:optimizeLegibility;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.eyebrow,.tag,.pin-num,.mono{
+    font-family: "Bahnschrift", "Roboto Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  }
+  code, .mono, .pin-num, table.pinout td.num, table.pinout td.bcm{
+    font-family: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Roboto Mono", Menlo, monospace;
+  }
+
+  h1{ font-size:clamp(28px,4.2vw,42px); font-weight:800; letter-spacing:-.01em; margin:.15em 0 .1em; text-wrap:balance; }
+  h2{ font-size:clamp(20px,2.6vw,25px); font-weight:800; letter-spacing:-.005em; margin:0 0 .4em; text-wrap:balance; }
+  h3{ font-size:16px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; margin:0 0 .5em; color:var(--ink-soft); }
+  p{ margin:.6em 0; }
+  a{ color:var(--accent); }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:56px 28px 90px; }
+  .prose{ max-width:70ch; }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:.5em;
+    font-size:12.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent);
+  }
+  .eyebrow::before{ content:""; width:22px; height:2px; background:var(--accent); display:inline-block; }
+
+  header.masthead{
+    display:flex; flex-direction:column; gap:14px;
+    padding-bottom:34px; margin-bottom:40px;
+    border-bottom:1px solid var(--line);
+  }
+  header.masthead .lede{ font-size:19px; color:var(--ink-soft); max-width:66ch; }
+  header.masthead .meta{
+    display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:6px;
+    font-family:"Bahnschrift","Roboto Condensed",Arial,sans-serif;
+    font-size:13px; color:var(--ink-soft); letter-spacing:.02em;
+  }
+  header.masthead .meta b{ color:var(--ink); font-weight:700; }
+
+  .callout{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px; box-shadow:var(--shadow);
+  }
+  .callout.warn{ border-color:color-mix(in srgb, var(--c-power) 45%, var(--line)); }
+  .callout.warn h3{ color:var(--c-power); }
+
+  section{ margin:56px 0; }
+  section > .section-head{ margin-bottom:20px; }
+  section > .section-head .kicker{
+    font-size:12.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft);
+  }
+
+  /* bill of materials */
+  .bom-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:8px 24px; margin-top:16px;
+  }
+  .bom-item{
+    display:flex; align-items:baseline; gap:10px; font-size:15px;
+    padding:7px 0; border-bottom:1px solid var(--line);
+  }
+  .bom-qty{
+    flex:none; min-width:2.6em; font-family:ui-monospace,Consolas,monospace;
+    font-size:13px; font-weight:700; color:var(--accent);
+  }
+  .bom-note{ color:var(--ink-soft); font-size:13.5px; }
+
+  /* legend */
+  .legend-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:10px 22px; margin-top:14px;
+  }
+  .legend-item{ display:flex; align-items:center; gap:10px; font-size:14.5px; }
+  .legend-swatch{ width:22px; height:6px; border-radius:3px; flex:none; }
+  .legend-item .lbl{ color:var(--ink); }
+  .legend-item .sub{ color:var(--ink-soft); font-size:12.5px; }
+
+  /* figure / svg containers */
+  figure{ margin:0; }
+  figure.diagram{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:18px; box-shadow:var(--shadow);
+  }
+  figure.diagram .svg-scroll{ overflow-x:auto; }
+  figure.diagram svg{ display:block; width:100%; height:auto; max-width:100%; }
+  figcaption{
+    margin-top:14px; font-size:14.5px; color:var(--ink-soft);
+    font-family:"Iowan Old Style",Georgia,serif; font-style:italic;
+  }
+  figcaption b{ font-style:normal; color:var(--ink); }
+
+  /* detail cards grid */
+  .detail-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:22px; margin-top:22px; }
+  .detail-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:20px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:12px;
+  }
+  .detail-card h3{ margin-bottom:0; display:flex; align-items:center; gap:8px; }
+  .detail-card .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:22px; height:22px; border-radius:50%; background:var(--accent-soft); color:var(--accent);
+    font-size:12px; font-weight:800;
+  }
+  .detail-card svg{ width:100%; height:auto; display:block; }
+  .detail-card .note{ font-size:14.5px; color:var(--ink-soft); }
+  .detail-card .note b{ color:var(--ink); }
+
+  /* table */
+  .table-scroll{ overflow-x:auto; border:1px solid var(--line); border-radius:12px; }
+  table.pinout{ border-collapse:collapse; width:100%; min-width:760px; font-size:13.5px; background:var(--surface); }
+  table.pinout th, table.pinout td{ padding:8px 12px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; }
+  table.pinout thead th{
+    font-family:"Bahnschrift","Roboto Condensed",Arial,sans-serif; font-size:11.5px;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft);
+    background:var(--surface-2); position:sticky; top:0;
+  }
+  table.pinout td.num{ color:var(--ink-soft); }
+  table.pinout tr:last-child td{ border-bottom:none; }
+  table.pinout .dot{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:8px; vertical-align:middle; }
+  table.pinout tr:hover td{ background:var(--surface-2); }
+
+  /* pitfalls */
+  .pitfall-list{ display:flex; flex-direction:column; gap:16px; margin-top:18px; }
+  .pitfall{
+    display:grid; grid-template-columns:34px 1fr; gap:14px;
+    background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--c-power);
+    border-radius:10px; padding:16px 18px;
+  }
+  .pitfall .mark{ font-size:20px; line-height:1; color:var(--c-power); font-weight:800; }
+  .pitfall h4{ margin:0 0 4px; font-size:15.5px; font-family:"Bahnschrift","Roboto Condensed",Arial,sans-serif; }
+  .pitfall p{ margin:0; font-size:14.5px; color:var(--ink-soft); }
+  .pitfall p b{ color:var(--ink); }
+
+  footer{
+    margin-top:70px; padding-top:26px; border-top:1px solid var(--line);
+    font-size:13.5px; color:var(--ink-soft);
+  }
+
+  @media print{
+    body{ background:#fff; color:#111; }
+    .wrap{ padding:20px; }
+    figure.diagram, .detail-card, .pitfall, table.pinout{ box-shadow:none; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <span class="eyebrow">Guide de câblage · Raspberry Pi</span>
+    <h1>Construire sa radio Internet, poste par poste</h1>
+    <p class="lede">
+      À l'heure où la diffusion FM de certaines stations s'arrête, voici de quoi se
+      monter un tuner Internet maison : un Raspberry&nbsp;Pi, un DAC HAT pour une
+      sortie audio digne de ce nom, un afficheur LCD (pas un écran graphique — le
+      logiciel n'affiche que du texte), deux molettes façon poste vintage, des
+      boutons de préréglage — et surtout, tous les
+      petits pièges de câblage qu'on ne voit que la première fois qu'on s'y frotte
+      (diodes à l'envers, condensateur monté en série au lieu du parallèle, boutons
+      à 4 pattes qui lisent "appuyé" en permanence…). Ce guide part d'un montage
+      réellement construit et en fonctionnement, pas d'un plan théorique — les
+      numéros de broche indiqués sont ceux attendus par le logiciel qui fait
+      tourner ce montage ; les reprendre à l'identique, c'est pouvoir réutiliser
+      ce logiciel tel quel.
+    </p>
+    <div class="meta">
+      <span><b>Niveau</b> débutant DIY</span>
+      <span><b>Base</b> Raspberry Pi 3 Model B</span>
+      <span><b>Broches utilisées</b> 28 / 28 disponibles</span>
+      <span><b>Temps de montage</b> une soirée, hors séchage/soudure</span>
+      <span><b>Accès à Internet requis</b> via une box en Wi-Fi ou Ethernet (si le Raspberry est ≥&#160;Pi&#160;3)</span>
+    </div>
+  </header>
+
+  <section class="callout warn">
+    <h3>Avant de commencer</h3>
+    <p style="margin:0">
+      Éteignez et débranchez le Raspberry Pi avant toute manipulation de câblage.
+      Les composants <b>polarisés</b> (diode, LED, condensateur électrolytique) ne
+      fonctionnent que dans un sens — les monter à l'envers ne les fait pas
+      forcément griller, mais ça ne marche pas, et pour le condensateur mieux vaut
+      vérifier avant la première mise sous tension. Chaque figure ci-dessous indique
+      le sens à respecter.
+    </p>
+  </section>
+
+  <!-- ============ BILL OF MATERIALS ============ -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">Avant d'acheter</div>
+      <h2>Liste du matériel</h2>
+    </div>
+    <div class="bom-grid">
+      <div class="bom-item"><span class="bom-qty">1×</span> Raspberry&#160;Pi&#160;3, Debian 13 (Trixie)</div>
+      <div class="bom-item"><span class="bom-qty">1×</span> HAT DAC — InnoMaker DAC Mini HAT, carte audio PCM5122 pour Pi 5/4/3B+/Zero&#160;2W, 384&#160;kHz/32&#160;bits, sortie RCA + jack 3,5&#160;mm</div>
+      <div class="bom-item"><span class="bom-qty">1×</span> afficheur LCD I2C 16×2 — Freenove I2C/IIC LCD 1602 Display Serial</div>
+      <div class="bom-item"><span class="bom-qty">2×</span> LED (diodes électroluminescentes)</div>
+      <div class="bom-item"><span class="bom-qty">2×</span> résistances 330&#8239;Ω</div>
+      <div class="bom-item"><span class="bom-qty">2×</span> encodeurs rotatifs</div>
+      <div class="bom-item"><span class="bom-qty">1×</span> condensateur électrolytique 470&#8239;µF</div>
+      <div class="bom-item"><span class="bom-qty">11×</span> boutons poussoir (10 favoris + 1 arrêt)</div>
+      <div class="bom-item"><span class="bom-qty">1×</span> interrupteur à cliquet (bascule marche/arrêt)</div>
+      <div class="bom-item"><span class="bom-qty">1×</span> connecteur USB (pour l'alimentation)</div>
+      <div class="bom-item"><span class="bom-qty">1×</span> bloc secteur 5&#160;V / 3&#160;A</div>
+      <div class="bom-item"><span class="bom-qty">—</span> carte(s) circuit imprimé DIY (perfboard/prototypage)</div>
+      <div class="bom-item"><span class="bom-qty">—</span> câbles de câblage (dupont/fil rigide selon montage)</div>
+    </div>
+    <p class="bom-note">Outils : un fer à souder — utile dès qu'on passe du breadboard au montage définitif
+    sur carte perfboard — et un voltmètre (multimètre), pour vérifier la continuité des boutons à 4 pattes
+    et les tensions en cas de souci d'alimentation.</p>
+    <p class="bom-note" style="margin-top:8px">
+      Ce montage tourne aussi bien sur un Pi&#160;Zero&#160;W que sur n'importe quel modèle plus récent que
+      le Pi&#160;3 — mais inutile de sacrifier une machine plus puissante pour ça : les besoins (LCD texte,
+      lecture audio en streaming) restent minces, un Pi&#160;3 ou un Zero&#160;W suffisent largement.
+    </p>
+  </section>
+
+  <!-- ============ LEGEND ============ -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">Repères</div>
+      <h2>Comment lire les schémas</h2>
+    </div>
+    <p class="prose" style="color:var(--ink-soft)">
+      Chaque famille de fils garde la même couleur d'un bout à l'autre du guide —
+      un fil cuivre part toujours de la molette de volume, un fil vert toujours
+      d'un bouton de préréglage, etc. Utile pour retrouver un fil dans le schéma
+      d'ensemble comme dans le tableau détaillé plus bas.
+    </p>
+    <div class="legend-grid">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--c-power)"></span><span class="lbl">Alimentation <span class="sub">— 5V / 3,3V</span></span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--c-gnd)"></span><span class="lbl">Masse <span class="sub">— GND</span></span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--c-i2c)"></span><span class="lbl">Bus I2C <span class="sub">— partagé écran + DAC</span></span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--c-hat)"></span><span class="lbl">HAT DAC <span class="sub">— réservé, ne pas toucher</span></span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--c-encvol)"></span><span class="lbl">Molette volume</span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--c-encsta)"></span><span class="lbl">Molette station</span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--c-fav)"></span><span class="lbl">Boutons de préréglage</span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--c-led)"></span><span class="lbl">Voyants LED</span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--c-shutdown)"></span><span class="lbl">Bouton d'arrêt</span></div>
+    </div>
+  </section>
+
+  <!-- ============ MAIN ASSEMBLY ILLUSTRATION ============ -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">Vue d'ensemble</div>
+      <h2>Le montage complet, d'un coup d'œil</h2>
+    </div>
+    <figure class="diagram">
+      <div class="svg-scroll">
+        <svg viewBox="0 0 1400 1150" role="img" aria-label="Schéma d'assemblage illustré : le Raspberry Pi au centre avec le HAT DAC empilé sur tout le connecteur GPIO (picots dupliqués en pass-through) et ses deux prises RCA orientées vers le bas, les deux molettes rotatives au-dessus, l'écran LCD en haut à gauche, les boutons de préréglage en haut à droite, le bloc alimentation à gauche au niveau de la carte principale (prise USB, interrupteur sur le seul fil 5V, condensateur en dérivation, et un circuit d'arrêt logiciel clairement indépendant relié uniquement à GPIO14 et à la masse), et les LED avec leur résistance plus bas à droite, chaque liaison filaire codée par couleur selon sa fonction.">
+
+          <defs>
+            <marker id="wend" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+              <circle cx="3.5" cy="3.5" r="3" fill="currentColor" />
+            </marker>
+            <marker id="audioarrow" markerWidth="10" markerHeight="9" refX="8" refY="4.5" orient="auto">
+              <polygon points="0,0 9,4.5 0,9" fill="currentColor" />
+            </marker>
+          </defs>
+
+          <!-- ================= RASPBERRY PI BOARD (centered) ================= -->
+          <g>
+            <rect x="470" y="400" width="460" height="300" rx="16" fill="var(--surface-2)" stroke="var(--ink-soft)" stroke-width="1.5"/>
+            <circle cx="492" cy="672" r="5" fill="none" stroke="var(--ink-soft)"/>
+            <circle cx="908" cy="672" r="5" fill="none" stroke="var(--ink-soft)"/>
+            <!-- USB / ethernet suggestion, bottom edge -->
+            <rect x="820" y="676" width="46" height="14" rx="2" fill="none" stroke="var(--ink-soft)"/>
+            <rect x="870" y="676" width="46" height="14" rx="2" fill="none" stroke="var(--ink-soft)"/>
+            <rect x="500" y="676" width="34" height="14" rx="2" fill="none" stroke="var(--ink-soft)"/>
+            <text x="700" y="600" text-anchor="middle" font-size="22" font-weight="800" fill="var(--ink-soft)" opacity=".5">Raspberry&#160;Pi&#160;3</text>
+            <text x="700" y="627" text-anchor="middle" font-size="12.5" fill="var(--ink-soft)" opacity=".5">USB / Ethernet</text>
+          </g>
+
+          <!-- ================= HEADER PIN GRID — pins 1-40, c = 1..20 ================= -->
+          <!-- x(c) = 490 + (c-1)*19.5 ; top row (odd) y=432 ; bottom row (even) y=418 -->
+          <rect x="478" y="408" width="392" height="32" rx="5" fill="var(--surface)" stroke="var(--line)"/>
+          <rect x="486" y="428" width="7" height="7" fill="none" stroke="var(--ink-soft)"/>
+
+          <g>
+            <circle cx="490" cy="432" r="4" fill="var(--c-power)"/><circle cx="490" cy="418" r="4" fill="var(--c-power)"/>
+            <circle cx="510" cy="432" r="4" fill="var(--c-i2c)"/><circle cx="510" cy="418" r="4" fill="var(--c-power)"/>
+            <circle cx="529" cy="432" r="4" fill="var(--c-i2c)"/><circle cx="529" cy="418" r="4" fill="var(--c-gnd)"/>
+            <circle cx="549" cy="432" r="4" fill="var(--c-led)"/><circle cx="549" cy="418" r="4" fill="var(--c-shutdown)"/>
+            <circle cx="568" cy="432" r="4" fill="var(--c-gnd)"/><circle cx="568" cy="418" r="4" fill="var(--c-fav)"/>
+            <circle cx="588" cy="432" r="4" fill="var(--c-encvol)"/><circle cx="588" cy="418" r="4" fill="var(--c-hat)"/>
+            <circle cx="607" cy="432" r="4" fill="var(--c-encvol)"/><circle cx="607" cy="418" r="4" fill="var(--c-gnd)"/>
+            <circle cx="627" cy="432" r="4" fill="var(--c-encvol)"/><circle cx="627" cy="418" r="4" fill="var(--c-led)"/>
+            <circle cx="646" cy="432" r="4" fill="var(--c-power)"/><circle cx="646" cy="418" r="4" fill="var(--c-fav)"/>
+            <circle cx="666" cy="432" r="4" fill="var(--c-fav)"/><circle cx="666" cy="418" r="4" fill="var(--c-gnd)"/>
+            <circle cx="685" cy="432" r="4" fill="var(--c-fav)"/><circle cx="685" cy="418" r="4" fill="var(--c-fav)"/>
+            <circle cx="705" cy="432" r="4" fill="var(--c-fav)"/><circle cx="705" cy="418" r="4" fill="var(--c-fav)"/>
+            <circle cx="724" cy="432" r="4" fill="var(--c-gnd)"/><circle cx="724" cy="418" r="4" fill="var(--c-encsta)"/>
+            <circle cx="744" cy="432" r="4" fill="var(--c-hat)"/><circle cx="744" cy="418" r="4" fill="var(--c-hat)"/>
+            <circle cx="763" cy="432" r="4" fill="var(--c-encsta)"/><circle cx="763" cy="418" r="4" fill="var(--c-gnd)"/>
+            <circle cx="783" cy="432" r="4" fill="var(--c-hat)"/><circle cx="783" cy="418" r="4" fill="var(--c-fav)"/>
+            <circle cx="802" cy="432" r="4" fill="var(--c-encsta)"/><circle cx="802" cy="418" r="4" fill="var(--c-gnd)"/>
+            <circle cx="822" cy="432" r="4" fill="var(--c-hat)"/><circle cx="822" cy="418" r="4" fill="var(--c-fav)"/>
+            <circle cx="841" cy="432" r="4" fill="var(--c-hat)"/><circle cx="841" cy="418" r="4" fill="var(--c-fav)"/>
+            <circle cx="861" cy="432" r="4" fill="var(--c-gnd)"/><circle cx="861" cy="418" r="4" fill="var(--c-hat)"/>
+          </g>
+          <text x="674" y="386" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">connecteur GPIO 40 broches — détail dans le tableau plus bas</text>
+
+          <!-- ================= HAT DAC — covers the WHOLE 40-pin header (real geometry: ≈half the Pi 3 body, all of a Zero), pass-through pins replicated on top, RCA facing down at its outer edge ================= -->
+          <g>
+            <rect x="472" y="396" width="406" height="160" rx="12" fill="var(--accent-soft)" fill-opacity=".5" stroke="var(--c-hat)" stroke-width="1.5" stroke-dasharray="7 4"/>
+            <!-- pass-through: same signals re-exposed on top, so other wires still plug in above the HAT -->
+            <g stroke="var(--c-hat)" stroke-width="1.5" opacity=".85">
+              <line x1="560" y1="444" x2="560" y2="452"/>
+              <line x1="610" y1="444" x2="610" y2="452"/>
+              <line x1="660" y1="444" x2="660" y2="452"/>
+              <line x1="710" y1="444" x2="710" y2="452"/>
+              <line x1="760" y1="444" x2="760" y2="452"/>
+              <line x1="810" y1="444" x2="810" y2="452"/>
+            </g>
+            <text x="675" y="464" text-anchor="middle" font-size="9" fill="var(--ink-soft)">picots dupliqués (pass-through)</text>
+            <!-- title, moved clear below the GPIO grid so it no longer overlaps the pin dots -->
+            <text x="675" y="490" text-anchor="middle" font-size="13" font-weight="800" fill="var(--c-hat)">HAT DAC — PCM5122</text>
+            <text x="675" y="504" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)">recouvre tout le connecteur (≈ moitié du corps du Pi&#160;3)</text>
+            <!-- RCA jacks at the HAT's outer/lower edge, facing down and out from under the Pi -->
+            <g transform="translate(625,528)">
+              <circle r="10" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+              <circle r="6" fill="#B23A3A" stroke="var(--ink)" stroke-width="1"/>
+              <circle r="1.8" fill="var(--surface)"/>
+            </g>
+            <g transform="translate(655,528)">
+              <circle r="10" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+              <circle r="6" fill="#2B2B26" stroke="var(--ink)" stroke-width="1"/>
+              <circle r="1.8" fill="var(--surface)"/>
+            </g>
+            <text x="685" y="532" text-anchor="start" font-size="10" fill="var(--ink-soft)">RCA</text>
+            <!-- optional 3,5 mm jack, present on some HAT variants -->
+            <g transform="translate(715,528)">
+              <circle r="9" fill="none" stroke="var(--ink-soft)" stroke-width="1.3" stroke-dasharray="2 2"/>
+              <circle r="3" fill="var(--surface-2)" stroke="var(--ink-soft)" stroke-width="1"/>
+            </g>
+            <text x="726" y="532" text-anchor="start" font-size="9" fill="var(--ink-soft)">jack 3,5&#8239;mm</text>
+            <text x="726" y="544" text-anchor="start" font-size="8" fill="var(--ink-soft)">(selon modèle)</text>
+          </g>
+
+          <!-- ================= Flux audio — RCA vers l'ampli/les enceintes (hors montage GPIO) ================= -->
+          <path d="M625,538 C590,610 595,670 618,712" fill="none" stroke="var(--ink-soft)" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#audioarrow)"/>
+          <path d="M655,538 C690,610 685,670 664,712" fill="none" stroke="var(--ink-soft)" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#audioarrow)"/>
+          <text x="642" y="732" text-anchor="middle" font-size="10" fill="var(--ink-soft)">vers ampli / enceintes</text>
+          <text x="642" y="745" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">(câble RCA, hors GPIO)</text>
+
+          <!-- ================= Volume encoder — top-centre ================= -->
+          <g>
+            <circle cx="607" cy="250" r="32" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.5"/>
+            <line x1="607" y1="250" x2="607" y2="224" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="607" cy="250" r="5" fill="var(--c-encvol)"/>
+            <text x="607" y="298" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Molette volume</text>
+            <text x="607" y="313" text-anchor="middle" font-size="10" fill="var(--ink-soft)">CLK · DT · SW (clic = mute)</text>
+            <!-- each leg targets the lower (odd) row, so it must dodge sideways before its final drop —
+                 straight down would visibly cross the pin sitting right above its own target -->
+            <polyline points="588,282 584,282 584,432 588,432" fill="none" stroke="var(--c-encvol)" marker-end="url(#wend)"/>
+            <polyline points="607,282 603,282 603,432 607,432" fill="none" stroke="var(--c-encvol)" marker-end="url(#wend)"/>
+            <polyline points="626,282 622,282 622,432 627,432" fill="none" stroke="var(--c-encvol)" marker-end="url(#wend)"/>
+          </g>
+
+          <!-- ================= Station encoder — top-centre ================= -->
+          <g>
+            <circle cx="763" cy="250" r="32" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.5"/>
+            <line x1="763" y1="250" x2="763" y2="224" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="763" cy="250" r="5" fill="var(--c-encsta)"/>
+            <text x="763" y="298" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Molette station</text>
+            <text x="763" y="313" text-anchor="middle" font-size="10" fill="var(--ink-soft)">CLK · DT · SW (long = écran)</text>
+            <polyline points="744,282 724,300 724,418" fill="none" stroke="var(--c-encsta)" marker-end="url(#wend)"/>
+            <polyline points="763,282 759,282 759,432 763,432" fill="none" stroke="var(--c-encsta)" marker-end="url(#wend)"/>
+            <polyline points="782,282 798,300 798,432 802,432" fill="none" stroke="var(--c-encsta)" marker-end="url(#wend)"/>
+            <text x="700" y="335" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">les 3 fils passent devant le HAT</text>
+          </g>
+
+          <!-- ================= LCD — separate, upper-left, well away from power ================= -->
+          <g>
+            <rect x="60" y="120" width="190" height="96" rx="8" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.5"/>
+            <rect x="76" y="136" width="158" height="48" rx="3" fill="var(--paper)" stroke="var(--line)"/>
+            <text x="155" y="166" text-anchor="middle" font-size="13" fill="var(--ink-soft)" style="font-family:ui-monospace,monospace">F. MUSIQUE</text>
+            <text x="155" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">Écran LCD 16×2 (I2C, 5V)</text>
+            <text x="155" y="105" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">VCC(5V) · GND · SDA · SCL</text>
+            <!-- staggered heights so no two of the 4 wires share a run/column overlap (pins 3 and 4 share
+                 column 510 — SDA is offset onto its own lane 500 until the very last hop, so it never
+                 rides the same line as VCC) -->
+            <polyline points="120,216 120,240 564,240 564,432 568,432" fill="none" stroke="var(--c-gnd)" marker-end="url(#wend)"/>
+            <polyline points="200,216 200,270 525,270 525,432 529,432" fill="none" stroke="var(--c-i2c)" marker-end="url(#wend)"/>
+            <polyline points="90,216 90,300 510,300 510,418" fill="none" stroke="var(--c-power)" marker-end="url(#wend)"/>
+            <polyline points="160,216 160,340 500,340 500,432 510,432" fill="none" stroke="var(--c-i2c)" marker-end="url(#wend)"/>
+          </g>
+
+          <!-- ================= Favourite buttons — TOP-RIGHT, mirrors the LCD's top-left slot ================= -->
+          <g>
+            <rect x="1090" y="100" width="270" height="235" rx="12" fill="none" stroke="var(--line)" stroke-dasharray="4 4"/>
+            <text x="1225" y="124" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">Boutons de préréglage</text>
+            <text x="1225" y="140" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)">jusqu'à 10 — un seul dessiné, câblez-en moins si besoin</text>
+
+            <!-- detailed 4-leg button, diagonal wired, matching real build -->
+            <g transform="translate(1155,168)">
+              <rect x="0" y="0" width="70" height="70" rx="8" fill="var(--surface-2)" stroke="var(--c-fav)" stroke-width="1.5"/>
+              <circle cx="35" cy="35" r="18" fill="none" stroke="var(--c-fav)"/>
+              <circle cx="10" cy="10" r="3" fill="var(--c-fav)"/>
+              <circle cx="60" cy="10" r="3" fill="none" stroke="var(--ink-soft)"/>
+              <circle cx="10" cy="60" r="3" fill="none" stroke="var(--ink-soft)"/>
+              <circle cx="60" cy="60" r="3" fill="var(--c-fav)"/>
+            </g>
+            <g opacity=".3" transform="translate(1130,180)"><rect width="52" height="52" rx="6" fill="none" stroke="var(--c-fav)"/></g>
+            <g opacity=".18" transform="translate(1108,190)"><rect width="40" height="40" rx="5" fill="none" stroke="var(--c-fav)"/></g>
+
+            <!-- two legs: GPIO (top-left) + GND (bottom-right) -->
+            <polyline points="1165,178 1135,158 1105,158" fill="none" stroke="var(--c-fav)" marker-end="url(#wend)"/>
+            <text x="1100" y="154" text-anchor="end" font-size="9" fill="var(--c-fav)">GPIO</text>
+            <polyline points="1215,228 1250,255 1280,255" fill="none" stroke="var(--c-gnd)" marker-end="url(#wend)"/>
+            <text x="1285" y="259" text-anchor="start" font-size="9" fill="var(--ink-soft)">masse</text>
+
+            <text x="1225" y="288" text-anchor="middle" font-size="9" fill="var(--ink-soft)">diagonale câblée, l'autre isolée</text>
+            <text x="1225" y="304" text-anchor="middle" font-size="9" fill="var(--ink-soft)">détail complet ⤵ zoom 1</text>
+          </g>
+          <!-- bundled wire, short trip down through open space above the header (never crosses the
+               station encoder or the HAT — both are further left/lower) -->
+          <polyline points="1180,335 1180,360 822,360 822,418" fill="none" stroke="var(--c-fav)" marker-end="url(#wend)"/>
+          <text x="1180" y="352" text-anchor="middle" font-size="9" fill="var(--c-fav)">×10 → GPIO 16,12,25,24,8,9,10,11,15,20</text>
+
+          <!-- ================= POWER BLOCK — left, level with the Pi board itself ================= -->
+          <g>
+            <rect x="40" y="380" width="380" height="340" rx="14" fill="none" stroke="var(--c-power)" stroke-dasharray="4 4"/>
+            <text x="230" y="404" text-anchor="middle" font-size="13" font-weight="800" fill="var(--c-power)">BLOC ALIMENTATION</text>
+            <text x="230" y="420" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)">remplace le port micro-USB du Pi</text>
+
+            <!-- ===== 5V circuit: USB jack -> interrupteur -> condensateur en dérivation -> Pi ===== -->
+            <g transform="translate(58,458)">
+              <rect x="0" y="0" width="30" height="14" rx="4" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.5"/>
+              <text x="15" y="-6" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--ink)">prise USB</text>
+              <text x="15" y="28" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">chargeur 5V/3A</text>
+              <text x="15" y="39" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">ou alim Pi officielle</text>
+            </g>
+
+            <!-- 5V rail (red) and GND rail (grey), both leaving the USB jack -->
+            <line x1="88" y1="465" x2="420" y2="465" stroke="var(--c-power)" stroke-width="2.2"/>
+            <text x="345" y="459" text-anchor="middle" font-size="10" fill="var(--c-power)">5V</text>
+            <line x1="88" y1="515" x2="420" y2="515" stroke="var(--c-gnd)" stroke-width="2.2"/>
+            <text x="345" y="530" text-anchor="middle" font-size="10" fill="var(--ink-soft)">GND</text>
+            <!-- switch — cuts the 5V line only, never GND -->
+            <rect x="176" y="461" width="42" height="8" fill="var(--surface)"/>
+            <g transform="translate(180,465)">
+              <circle cx="0" cy="0" r="3.2" fill="var(--c-power)"/>
+              <circle cx="34" cy="0" r="3.2" fill="var(--c-power)"/>
+              <line x1="0" y1="0" x2="27" y2="-15" stroke="var(--c-power)" stroke-width="2"/>
+              <text x="17" y="-22" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ink)">interrupteur</text>
+              <text x="17" y="20" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">coupe/redémarre le Pi</text>
+              <text x="17" y="31" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">sans le débrancher</text>
+            </g>
+
+            <!-- capacitor bridging 5V and GND — the only connection between the two rails -->
+            <g transform="translate(300,465)">
+              <line x1="0" y1="0" x2="0" y2="18" stroke="var(--ink)" stroke-width="2"/>
+              <line x1="0" y1="32" x2="0" y2="50" stroke="var(--ink)" stroke-width="2"/>
+              <rect x="-11" y="18" width="22" height="14" rx="6" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.5"/>
+              <text x="14" y="14" font-size="9" fill="var(--ink-soft)">+</text>
+              <text x="14" y="38" font-size="9" fill="var(--ink-soft)">− (bande repère)</text>
+              <text x="0" y="-8" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ink)">condensateur 470&#8239;µF</text>
+              <text x="0" y="95" text-anchor="middle" font-size="9" fill="var(--ink-soft)">en dérivation entre 5V et GND,</text>
+              <text x="0" y="107" text-anchor="middle" font-size="9" fill="var(--ink-soft)">au plus près des broches du Pi</text>
+            </g>
+
+            <!-- exits — 5V climbs offset from pin 1/2's shared column the whole way, only entering that
+                 column once exactly level with pin 2. GND uses a lane past pin 2 entirely, jogging above
+                 the header so it never shares a line with the 5V wire. -->
+            <polyline points="420,465 458,465 458,418 490,418" fill="none" stroke="var(--c-power)" marker-end="url(#wend)"/>
+            <circle cx="490" cy="418" r="7.5" fill="none" stroke="var(--c-power)" stroke-width="1.5"/>
+            <text x="490" y="450" text-anchor="middle" font-size="9" font-weight="700" fill="var(--c-power)">5V (broche 2)</text>
+            <polyline points="420,515 505,515 505,405 529,405 529,418" fill="none" stroke="var(--c-gnd)" marker-end="url(#wend)"/>
+
+            <!-- ===== divider ===== -->
+            <line x1="60" y1="590" x2="400" y2="590" stroke="var(--line)" stroke-width="1"/>
+            <text x="230" y="610" text-anchor="middle" font-size="11" font-weight="800" fill="var(--c-shutdown)">ARRÊT LOGICIEL — circuit indépendant</text>
+            <text x="230" y="624" text-anchor="middle" font-size="9" fill="var(--ink-soft)">jamais relié au 5V ci-dessus : seulement GPIO14 et masse</text>
+
+            <!-- shutdown button — own isolated pair of wires, own lanes past pin 2, never touches the 5V rail -->
+            <g transform="translate(90,644)">
+              <rect x="0" y="0" width="40" height="40" rx="6" fill="var(--surface-2)" stroke="var(--c-shutdown)" stroke-width="1.5"/>
+              <circle cx="20" cy="20" r="9" fill="none" stroke="var(--c-shutdown)"/>
+              <text x="60" y="16" font-size="10" font-weight="700" fill="var(--ink)">Bouton arrêt</text>
+              <text x="60" y="30" font-size="9" fill="var(--ink-soft)">maintien ~0,5&#8239;s</text>
+              <text x="60" y="44" font-size="9" fill="var(--ink-soft)">déclenche <tspan style="font-family:ui-monospace,monospace">shutdown -h now</tspan></text>
+            </g>
+            <polyline points="140,654 535,654 535,406 549,406 549,418" fill="none" stroke="var(--c-shutdown)" marker-end="url(#wend)"/>
+            <text x="541" y="402" text-anchor="middle" font-size="9" fill="var(--c-shutdown)">GPIO14</text>
+            <polyline points="140,674 520,674 520,412 529,412 529,418" fill="none" stroke="var(--c-gnd)" marker-end="url(#wend)"/>
+            <text x="520" y="406" text-anchor="middle" font-size="9" fill="var(--ink-soft)">masse</text>
+          </g>
+
+          <!-- ================= LEDs — lowered a little, wires pass through the HAT's own translucent
+               middle instead of looping above the whole diagram ================= -->
+          <g>
+            <rect x="1040" y="540" width="280" height="220" rx="12" fill="none" stroke="var(--line)" stroke-dasharray="4 4"/>
+            <text x="1180" y="564" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">Voyants LED</text>
+
+            <!-- LED action — anode leg (toward resistor/GPIO) in c-led, cathode leg (toward masse) in c-gnd -->
+            <g transform="translate(1090,600)">
+              <circle cx="0" cy="0" r="11" fill="none" stroke="var(--ink)" stroke-width="2"/>
+              <line x1="-4" y1="10" x2="-4" y2="24" stroke="var(--c-led)" stroke-width="1.5"/>
+              <line x1="4" y1="10" x2="4" y2="30" stroke="var(--c-gnd)" stroke-width="1.5"/>
+              <text x="26" y="4" font-size="11" fill="var(--ink)">LED action</text>
+              <polyline points="-4,24 -4,34 -12,40 4,50 -12,60 4,68 -4,74 -4,84" fill="none" stroke="var(--c-led)" stroke-width="1.6"/>
+              <text x="-64" y="58" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">330&#8239;Ω</text>
+              <text x="24" y="34" font-size="9" fill="var(--ink-soft)">masse</text>
+            </g>
+            <!-- LED lecture -->
+            <g transform="translate(1090,690)">
+              <circle cx="0" cy="0" r="11" fill="none" stroke="var(--ink)" stroke-width="2"/>
+              <line x1="-4" y1="10" x2="-4" y2="24" stroke="var(--c-led)" stroke-width="1.5"/>
+              <line x1="4" y1="10" x2="4" y2="30" stroke="var(--c-gnd)" stroke-width="1.5"/>
+              <text x="26" y="4" font-size="11" fill="var(--ink)">LED lecture</text>
+              <polyline points="-4,24 -4,34 -12,40 4,50 -12,60 4,68 -4,74 -4,84" fill="none" stroke="var(--c-led)" stroke-width="1.6"/>
+              <text x="-64" y="58" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">330&#8239;Ω</text>
+              <text x="24" y="34" font-size="9" fill="var(--ink-soft)">masse</text>
+            </g>
+
+            <!-- wires wrap the board's right edge then rise a short way into the HAT's own translucent
+                 zone (visible "through" it, like the pass-through pins) rather than looping over the top —
+                 staggered heights so none of the 4 overlap; the odd-row target gets its usual offset drop -->
+            <!-- approaching from below (jog heights 462-486, all past y432) means every one of these
+                 would climb straight through the pin sharing its own column unless offset — same fix as
+                 the encoders/LCD: dodge sideways, only entering the true column once level with the target -->
+            <polyline points="1040,590 955,590 955,512 545,512 545,432 549,432" fill="none" stroke="var(--c-led)" marker-end="url(#wend)"/>
+            <polyline points="1040,620 965,620 965,478 603,478 603,418 607,418" fill="none" stroke="var(--c-gnd)" marker-end="url(#wend)"/>
+            <polyline points="1040,650 975,650 975,470 623,470 623,418 627,418" fill="none" stroke="var(--c-led)" marker-end="url(#wend)"/>
+            <polyline points="1040,680 985,680 985,455 662,455 662,418 666,418" fill="none" stroke="var(--c-gnd)" marker-end="url(#wend)"/>
+          </g>
+
+        </svg>
+      </div>
+      <figcaption>
+        <b>Vue d'assemblage :</b> le HAT DAC recouvre tout le connecteur GPIO
+        (comme en vrai — moitié du corps sur un Pi&#160;3, la totalité sur un
+        Zero) et réplique les 40 broches en pass-through. Position et longueur
+        des fils sont schématiques, pas à l'échelle du vrai boîtier.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="callout warn">
+    <h3>Point de vigilance — alimentation par les broches GPIO</h3>
+    <p style="margin:0">
+      Alimenter le Pi par les broches 5V/GND plutôt que par le port micro-USB
+      contourne le fusible et la protection intégrés à ce port — c'est ce qui
+      permet l'interrupteur, mais ça rend aussi le montage plus sensible à la
+      qualité du câblage : une connexion un peu résistive (fil fin, connecteur
+      de mauvaise qualité) peut suffire à déclencher une sous-tension sous
+      charge, même avec une alimentation correctement dimensionnée. Après le
+      montage, vérifiez avec <code>vcgencmd get_throttled</code> — un résultat
+      différent de <code>0x0</code> signale une sous-tension active ou passée.
+      Sur ce montage précis, ce point n'est <b>pas encore totalement réglé</b> :
+      un défaut intermittent est encore en cours de diagnostic au moment de la
+      rédaction de ce guide. À surveiller, donc, plutôt qu'à considérer comme
+      acquis.
+    </p>
+  </section>
+
+  <!-- ============ DETAIL INSETS ============ -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">Zoom</div>
+      <h2>Les trois pièges qui donnent du fil à retordre</h2>
+    </div>
+    <div class="detail-grid">
+
+      <!-- Detail 1 : 4-leg button -->
+      <div class="detail-card">
+        <h3><span class="num">1</span> Le bouton à 4 pattes</h3>
+        <svg viewBox="0 0 320 210" role="img" aria-label="Vue de dessus d'un bouton poussoir à 4 pattes : les deux pattes d'un même côté sont pontées en permanence à l'intérieur du boîtier. Montage retenu : la diagonale haut-gauche vers bas-droite reliée au GPIO et à la masse, l'autre diagonale soudée mais non connectée.">
+          <!-- WRONG -->
+          <g transform="translate(10,10)">
+            <text x="65" y="0" text-anchor="middle" font-size="12" font-weight="800" fill="var(--c-power)">✕ Faux — même côté</text>
+            <rect x="20" y="14" width="90" height="90" rx="8" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.5"/>
+            <circle cx="65" cy="59" r="20" fill="none" stroke="var(--ink)"/>
+            <circle cx="34" cy="28" r="3" fill="var(--ink)"/>
+            <circle cx="96" cy="28" r="3" fill="var(--ink)"/>
+            <circle cx="34" cy="90" r="3" fill="var(--ink)"/>
+            <circle cx="96" cy="90" r="3" fill="var(--ink)"/>
+            <line x1="34" y1="28" x2="34" y2="90" stroke="var(--c-power)" stroke-width="2" stroke-dasharray="3 3"/>
+            <text x="8" y="59" text-anchor="end" font-size="8.5" fill="var(--c-power)">pontées</text>
+            <path d="M34,28 C 0,50 0,68 34,90" fill="none" stroke="var(--c-power)" stroke-width="2.5"/>
+            <text x="65" y="132" text-anchor="middle" font-size="10" fill="var(--ink-soft)">lit "appuyé" en</text>
+            <text x="65" y="145" text-anchor="middle" font-size="10" fill="var(--ink-soft)">permanence, même relâché</text>
+          </g>
+          <!-- RIGHT, matching the real build: diagonal wired, other diagonal soldered but isolated -->
+          <g transform="translate(180,10)">
+            <text x="65" y="0" text-anchor="middle" font-size="12" font-weight="800" fill="var(--accent)">✓ Retenu — diagonale</text>
+            <rect x="20" y="14" width="90" height="90" rx="8" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.5"/>
+            <circle cx="65" cy="59" r="20" fill="none" stroke="var(--ink)"/>
+            <circle cx="34" cy="28" r="3" fill="var(--ink)"/>
+            <circle cx="96" cy="28" r="3" fill="none" stroke="var(--ink-soft)"/>
+            <circle cx="34" cy="90" r="3" fill="none" stroke="var(--ink-soft)"/>
+            <circle cx="96" cy="90" r="3" fill="var(--ink)"/>
+            <line x1="34" y1="28" x2="34" y2="90" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="3 3" opacity=".5"/>
+            <line x1="96" y1="28" x2="96" y2="90" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="3 3" opacity=".5"/>
+            <line x1="34" y1="28" x2="96" y2="90" stroke="var(--accent)" stroke-width="2.5"/>
+            <line x1="34" y1="28" x2="6" y2="14" stroke="var(--c-fav)" stroke-width="2"/>
+            <text x="0" y="8" text-anchor="end" font-size="9" fill="var(--c-fav)">GPIO</text>
+            <line x1="96" y1="90" x2="124" y2="104" stroke="var(--c-gnd)" stroke-width="2"/>
+            <text x="128" y="108" text-anchor="start" font-size="9" fill="var(--ink-soft)">masse</text>
+            <text x="96" y="22" text-anchor="middle" font-size="8" fill="var(--ink-soft)">soudée,</text>
+            <text x="34" y="104" text-anchor="middle" font-size="8" fill="var(--ink-soft)">non connectée</text>
+          </g>
+        </svg>
+        <p class="note">Montage retenu pour ce projet : la diagonale
+        <b>haut-gauche / bas-droite</b> câblée (une patte au GPIO avec
+        résistance de tirage interne, l'autre à la masse), l'autre diagonale
+        <b>soudée mais volontairement non connectée</b> — par sécurité plutôt
+        que par nécessité. Vérifiez au multimètre (continuité, bouton non
+        alimenté) si un doute persiste sur un nouveau bouton.</p>
+      </div>
+
+      <!-- Detail 2 : LED polarity -->
+      <div class="detail-card">
+        <h3><span class="num">2</span> LED et résistance</h3>
+        <svg viewBox="0 0 320 150" role="img" aria-label="Schéma d'une broche GPIO reliée en série à une résistance de 330 ohms puis à une LED : la patte longue de la LED (anode) va vers la résistance, la patte courte côté méplat (cathode) va vers la masse.">
+          <text x="16" y="24" font-size="11" fill="var(--ink-soft)">GPIO</text>
+          <line x1="16" y1="70" x2="70" y2="70" stroke="var(--c-led)" stroke-width="2"/>
+          <polyline points="70,70 78,58 90,82 102,58 114,82 126,58 134,70" fill="none" stroke="var(--ink)" stroke-width="2"/>
+          <text x="102" y="40" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">résistance 330&#8239;Ω (220–330&#8239;Ω ok)</text>
+          <line x1="134" y1="70" x2="170" y2="70" stroke="var(--c-led)" stroke-width="2"/>
+          <polygon points="170,55 170,85 200,70" fill="none" stroke="var(--ink)" stroke-width="2"/>
+          <line x1="200" y1="55" x2="200" y2="85" stroke="var(--ink)" stroke-width="3"/>
+          <text x="185" y="30" text-anchor="middle" font-size="10" fill="var(--ink-soft)">patte longue = anode (+)</text>
+          <line x1="200" y1="70" x2="250" y2="70" stroke="var(--c-gnd)" stroke-width="2"/>
+          <text x="215" y="110" text-anchor="middle" font-size="10" fill="var(--ink-soft)">patte courte, côté méplat</text>
+          <text x="215" y="123" text-anchor="middle" font-size="10" fill="var(--ink-soft)">= cathode (−) → masse</text>
+          <text x="270" y="24" font-size="11" fill="var(--ink-soft)">GND</text>
+          <line x1="250" y1="70" x2="290" y2="70" stroke="var(--c-gnd)" stroke-width="2"/>
+        </svg>
+        <p class="note">Le sens de la résistance importe peu, celui de la LED oui :
+        <b>patte longue</b> (anode) côté résistance/GPIO, <b>patte courte</b> ou
+        méplat du boîtier (cathode) côté masse. À l'envers, la LED reste
+        simplement éteinte.</p>
+      </div>
+
+      <!-- Detail 3 : capacitor -->
+      <div class="detail-card">
+        <h3><span class="num">3</span> Le condensateur</h3>
+        <svg viewBox="0 0 320 190" role="img" aria-label="Comparaison de montage du condensateur : en série sur le fil d'alimentation, ce qui coupe le courant, contre en dérivation entre le 5V et la masse près des broches du Pi, le bon montage.">
+          <g transform="translate(10,10)">
+            <text x="65" y="0" text-anchor="middle" font-size="12" font-weight="800" fill="var(--c-power)">✕ Faux — en série</text>
+            <rect x="10" y="30" width="26" height="60" rx="10" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.5"/>
+            <text x="23" y="26" text-anchor="middle" font-size="9" fill="var(--ink-soft)">+</text>
+            <text x="23" y="104" text-anchor="middle" font-size="9" fill="var(--ink-soft)">−</text>
+            <line x1="0" y1="60" x2="10" y2="60" stroke="var(--c-power)" stroke-width="2"/>
+            <line x1="36" y1="60" x2="120" y2="60" stroke="var(--c-power)" stroke-width="2"/>
+            <text x="70" y="135" text-anchor="middle" font-size="10" fill="var(--ink-soft)">coupe l'alimentation :</text>
+            <text x="70" y="148" text-anchor="middle" font-size="10" fill="var(--ink-soft)">plus rien n'est alimenté</text>
+          </g>
+          <g transform="translate(170,10)">
+            <text x="65" y="0" text-anchor="middle" font-size="12" font-weight="800" fill="var(--accent)">✓ Bon — en dérivation</text>
+            <line x1="0" y1="30" x2="140" y2="30" stroke="var(--c-power)" stroke-width="2"/>
+            <line x1="0" y1="90" x2="140" y2="90" stroke="var(--c-gnd)" stroke-width="2"/>
+            <rect x="55" y="42" width="26" height="36" rx="9" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.5"/>
+            <line x1="68" y1="30" x2="68" y2="42" stroke="var(--ink)" stroke-width="2"/>
+            <line x1="68" y1="78" x2="68" y2="90" stroke="var(--ink)" stroke-width="2"/>
+            <text x="90" y="52" text-anchor="start" font-size="9" fill="var(--ink-soft)">+</text>
+            <text x="90" y="78" text-anchor="start" font-size="9" fill="var(--ink-soft)">− (repère)</text>
+            <text x="70" y="112" text-anchor="middle" font-size="10" fill="var(--ink)">5V ────┬──── vers le Pi</text>
+            <text x="70" y="140" text-anchor="middle" font-size="10" fill="var(--ink-soft)">le condensateur se branche</text>
+            <text x="70" y="153" text-anchor="middle" font-size="10" fill="var(--ink-soft)">en pont, pas sur le fil lui-même</text>
+          </g>
+        </svg>
+        <p class="note">Un condensateur électrolytique est <b>polarisé</b> : la
+        patte la plus longue va au + (5V), la patte marquée d'une bande sur le
+        boîtier va au − (masse). Il se monte <b>en parallèle</b> entre 5V et
+        masse, au plus près des broches du Pi — jamais coupé dans le fil.
+        Placé ici dans le bloc alimentation, pas près de l'écran : c'est le
+        5V général qu'il lisse, pas l'écran spécifiquement.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ FULL PINOUT TABLE ============ -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">Référence précise</div>
+      <h2>Tableau complet des 40 broches</h2>
+    </div>
+    <p class="prose" style="color:var(--ink-soft)">
+      Le schéma d'ensemble donne le principe ; ce tableau donne le numéro de
+      broche exact à utiliser pour chaque fil, dans l'ordre physique du
+      connecteur — ce sont les broches attendues par le logiciel qui pilote ce
+      montage. Pour les bases du GPIO en général (numérotation, bus I2C/SPI,
+      précautions électriques), voir aussi
+      <a href="https://www.raspberrypi-france.fr/comment-utiliser-les-port-gpio-raspberry-pi/" target="_blank" rel="noopener">ce guide de Raspberry Pi France</a>.
+    </p>
+    <div class="table-scroll">
+      <table class="pinout">
+        <thead>
+          <tr><th>#</th><th>BCM</th><th>Fonction</th><th>#</th><th>BCM</th><th>Fonction</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-power)"></span>3,3V</td><td class="num">2</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-power)"></span>5V — alimentation</td></tr>
+          <tr><td class="num">3</td><td class="bcm">GPIO2</td><td><span class="dot" style="background:var(--c-i2c)"></span>SDA1 — I2C (écran + DAC)</td><td class="num">4</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-power)"></span>5V — écran LCD</td></tr>
+          <tr><td class="num">5</td><td class="bcm">GPIO3</td><td><span class="dot" style="background:var(--c-i2c)"></span>SCL1 — I2C (écran + DAC)</td><td class="num">6</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-gnd)"></span>Masse — alimentation</td></tr>
+          <tr><td class="num">7</td><td class="bcm">GPIO4</td><td><span class="dot" style="background:var(--c-led)"></span>LED lecture</td><td class="num">8</td><td class="bcm">GPIO14</td><td><span class="dot" style="background:var(--c-shutdown)"></span>Bouton d'arrêt</td></tr>
+          <tr><td class="num">9</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-gnd)"></span>Masse — écran LCD</td><td class="num">10</td><td class="bcm">GPIO15</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 9</td></tr>
+          <tr><td class="num">11</td><td class="bcm">GPIO17</td><td><span class="dot" style="background:var(--c-encvol)"></span>Volume — CLK</td><td class="num">12</td><td class="bcm">GPIO18</td><td><span class="dot" style="background:var(--c-hat)"></span>I2S BCLK (HAT)</td></tr>
+          <tr><td class="num">13</td><td class="bcm">GPIO27</td><td><span class="dot" style="background:var(--c-encvol)"></span>Volume — DT</td><td class="num">14</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-gnd)"></span>Masse</td></tr>
+          <tr><td class="num">15</td><td class="bcm">GPIO22</td><td><span class="dot" style="background:var(--c-encvol)"></span>Volume — bouton (mute)</td><td class="num">16</td><td class="bcm">GPIO23</td><td><span class="dot" style="background:var(--c-led)"></span>LED action</td></tr>
+          <tr><td class="num">17</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-power)"></span>3,3V</td><td class="num">18</td><td class="bcm">GPIO24</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 4</td></tr>
+          <tr><td class="num">19</td><td class="bcm">GPIO10</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 7</td><td class="num">20</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-gnd)"></span>Masse</td></tr>
+          <tr><td class="num">21</td><td class="bcm">GPIO9</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 6</td><td class="num">22</td><td class="bcm">GPIO25</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 3</td></tr>
+          <tr><td class="num">23</td><td class="bcm">GPIO11</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 8</td><td class="num">24</td><td class="bcm">GPIO8</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 5</td></tr>
+          <tr><td class="num">25</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-gnd)"></span>Masse</td><td class="num">26</td><td class="bcm">GPIO7</td><td><span class="dot" style="background:var(--c-encsta)"></span>Station — DT</td></tr>
+          <tr><td class="num">27</td><td class="bcm">ID_SD</td><td><span class="dot" style="background:var(--c-hat)"></span>Réservé EEPROM HAT</td><td class="num">28</td><td class="bcm">ID_SC</td><td><span class="dot" style="background:var(--c-hat)"></span>Réservé EEPROM HAT</td></tr>
+          <tr><td class="num">29</td><td class="bcm">GPIO5</td><td><span class="dot" style="background:var(--c-encsta)"></span>Station — CLK</td><td class="num">30</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-gnd)"></span>Masse</td></tr>
+          <tr><td class="num">31</td><td class="bcm">GPIO6</td><td><span class="dot" style="background:var(--c-hat)"></span>Mute DAC — réservé noyau</td><td class="num">32</td><td class="bcm">GPIO12</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 2</td></tr>
+          <tr><td class="num">33</td><td class="bcm">GPIO13</td><td><span class="dot" style="background:var(--c-encsta)"></span>Station — bouton (écran)</td><td class="num">34</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-gnd)"></span>Masse</td></tr>
+          <tr><td class="num">35</td><td class="bcm">GPIO19</td><td><span class="dot" style="background:var(--c-hat)"></span>I2S LRCLK (HAT)</td><td class="num">36</td><td class="bcm">GPIO16</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 1</td></tr>
+          <tr><td class="num">37</td><td class="bcm">GPIO26</td><td><span class="dot" style="background:var(--c-hat)"></span>Réservé IR (HAT)</td><td class="num">38</td><td class="bcm">GPIO20</td><td><span class="dot" style="background:var(--c-fav)"></span>Favori 10</td></tr>
+          <tr><td class="num">39</td><td class="bcm">—</td><td><span class="dot" style="background:var(--c-gnd)"></span>Masse</td><td class="num">40</td><td class="bcm">GPIO21</td><td><span class="dot" style="background:var(--c-hat)"></span>I2S DOUT (HAT)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ PITFALLS ============ -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">Retour d'expérience</div>
+      <h2>Ce qui a coincé au montage réel</h2>
+    </div>
+    <div class="pitfall-list">
+      <div class="pitfall">
+        <div class="mark">!</div>
+        <div>
+          <h4>Une patte tordue lit "jamais appuyé"</h4>
+          <p>Sur breadboard, une patte légèrement pliée peut sembler branchée
+          alors qu'elle ne touche plus la piste. Symptôme : le bouton ou la
+          molette reste bloqué dans un état, même testé isolément. Diagnostic :
+          un petit script qui lit la broche GPIO brute (sans passer par la
+          bibliothèque haut niveau) confirme si le signal bouge physiquement
+          avant de soupçonner le logiciel.</p>
+        </div>
+      </div>
+      <div class="pitfall">
+        <div class="mark">!</div>
+        <div>
+          <h4>Bouton 4 pattes câblé sur le mauvais côté</h4>
+          <p>Voir <b>zoom 1</b> ci-dessus — c'est la cause la plus probable si un
+          bouton flambant neuf lit "appuyé" dès le branchement, sans même
+          y toucher. Contrôle rapide au multimètre avant de blâmer le
+          logiciel.</p>
+        </div>
+      </div>
+      <div class="pitfall">
+        <div class="mark">!</div>
+        <div>
+          <h4>Condensateur en série au lieu de en dérivation</h4>
+          <p>Voir <b>zoom 3</b> — une erreur facile en venant du monde des
+          résistances (où le sens et la position sur le fil importent peu). Un
+          condensateur électrolytique se pique <b>entre</b> 5V et masse, jamais
+          <b>sur</b> le fil d'alimentation lui-même.</p>
+        </div>
+      </div>
+      <div class="pitfall">
+        <div class="mark">!</div>
+        <div>
+          <h4>Confondre la broche 1 (3,3V) et la broche 2 (5V)</h4>
+          <p>Ce sont les deux toutes premières broches du connecteur, juste
+          l'une à côté de l'autre — faciles à confondre d'un coup d'œil.
+          Brancher une alimentation 5V sur la broche 3,3V (ou l'inverse) peut
+          endommager le Pi ou les composants qui y sont reliés. Vérifiez
+          toujours le numéro exact de broche avant de sertir un fil, pas
+          seulement sa position approximative dans le connecteur.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      Montage réellement construit et utilisé au quotidien, documenté ici pour
+      qu'il serve à d'autres. Les numéros de broche suivent volontairement
+      ceux attendus par le logiciel qui fait tourner ce montage — seules les
+      broches I2C (2/3) et I2S (18/19/21) sont de toute façon imposées par le
+      HAT DAC ; tout le reste peut être réparti différemment, à condition
+      d'adapter aussi la configuration du logiciel en conséquence. De même,
+      les 10 boutons de préréglage sont un maximum, pas une obligation :
+      n'en câblez que quelques-uns si 10 fait beaucoup pour un premier
+      montage — une broche listée mais non câblée ne pose aucun problème en
+      soi (elle reste simplement inactive). Ne retirez ses broches de la
+      liste des favoris côté logiciel que si vous voulez les réutiliser pour
+      autre chose.
+    </p>
+  </footer>
+
+</div>

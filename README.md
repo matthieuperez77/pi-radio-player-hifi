@@ -13,7 +13,7 @@ dédié, et un choix de stations bien plus large (réseau national Radio France
 |---|---|
 | Carte | Raspberry Pi 3, Debian 13 (Trixie) |
 | Écran | LCD caractères I2C (Qapass, backpack PCF8574), 16x2 par défaut — à ajuster dans `config.py` si finalement 20x4 |
-| Encodeur volume | Rotatif, +/- 2% par cran ; bouton intégré = bascule le **mute matériel du HAT** (GPIO6, coupe le son au niveau du DAC, indépendamment du volume logiciel mpv) |
+| Encodeur volume | Rotatif, +/- 1% par cran ; bouton intégré = bascule le **mute logiciel** (volume mpv mis à 0 puis restauré au niveau précédent — pas de pilotage du GPIO6 matériel du HAT, réservé au driver noyau) |
 | Encodeur station | Rotatif façon "tuner vintage" : chaque cran change immédiatement de station et lance la lecture ; bouton intégré (appui long ~1.5s) = bascule LCD actif/éteint pendant l'écoute |
 | Boutons favoris | 10 boutons poussoir : appui court = charge le favori du slot, appui long (~1.2s) = enregistre la station en cours dans le slot |
 | Bouton d'arrêt | 1 bouton poussoir dédié, maintien ~0.5s → arrêt propre du Raspberry Pi |
@@ -22,9 +22,9 @@ dédié, et un choix de stations bien plus large (réseau national Radio France
 
 ## Stations
 
-33 stations dans [`stations.yaml`](stations.yaml) :
+60 stations dans [`stations.yaml`](stations.yaml) :
 
-- **Réseau national Radio France** (24 flux) : France Inter, France Info,
+- **Réseau national Radio France** (25 flux) : France Inter, France Info,
   France Culture, Mouv', France Musique + 8 webradios thématiques, FIP + 11
   webradios thématiques. Chaque station a une liste `stream_urls` ordonnée
   (`hifi.aac` 192kbps → `midfi.mp3` 128kbps → `lofi.mp3` 32kbps) : `Player`
@@ -33,13 +33,16 @@ dédié, et un choix de stations bien plus large (réseau national Radio France
   Les 44 antennes locales du réseau "ici" (ex-France Bleu) sont **hors
   périmètre** par choix (infos très locales, moins pertinentes en écoute
   domestique).
-- **Sélection internationale** (9 flux, genres jazz/classique,
-  rock/pop/alternatif/électro, world/divers) : Radio Swiss Jazz, Radio
-  Swiss Classic, Radio Paradise (+ mix Rock et World/Etc), SomaFM (Groove
-  Salad, Drone Zone, Suburbs of Goa). **Ces flux tiers n'ont pas encore été
-  validés en conditions réelles** (moins stables que Radio France) — à
-  tester avec mpv avant de les considérer fiables. BBC volontairement
-  exclue (déjà source de problèmes récurrents dans le premier projet).
+- **Autres radios françaises hors Radio France** (1 flux) : Radio Nova
+  (liste `stream_urls` avec repli AAC → MP3, même principe que Radio France).
+- **Sélection internationale et thématique** (34 flux) : sélection
+  généraliste jazz/classique/rock/world (Radio Swiss Jazz, Radio Swiss
+  Classic, Radio Paradise, SomaFM...), Allemagne (5), Amérique latine (4),
+  flamenco (2), Inde/Tibet/Zen (4), Italie (4), Bretagne (2). Deux flux
+  (AIR Raagam, Radio Italia SMI) sont en HLS (`.m3u8`) plutôt qu'en Icecast
+  direct comme le reste — signalé en commentaire dans `stations.yaml`. BBC
+  volontairement exclue (déjà source de problèmes récurrents dans le
+  premier projet).
 - Métadonnées "case en cours" (`radiofrance_livemeta`) confirmées
   seulement pour France Musique (id 4) et FIP (id 7) ; les autres stations
   Radio France démarrent en `metadata.type: none` faute d'id vérifié — voir
@@ -75,6 +78,11 @@ Pinout complet (les 40 broches, numérotation physique et BCM), schéma par
 bloc fonctionnel et notes d'alimentation : voir
 [`docs/CABLAGE.md`](docs/CABLAGE.md). Toutes les valeurs viennent de
 `radio/config.py`, seule source de vérité si le câblage réel diverge.
+
+Guide illustré pas-à-pas pensé pour un public débutant (schéma d'assemblage,
+zooms sur les pièges de montage, liste de matériel) : voir
+[`docs/GUIDE_CABLAGE.html`](docs/GUIDE_CABLAGE.html) — à ouvrir dans un
+navigateur.
 
 ## Installation
 
@@ -139,7 +147,7 @@ Dans `scripts/`, à lancer indépendamment du service pour vérifier le
 câblage au fur et à mesure (voir l'en-tête de chaque fichier) :
 
 - `test_encoders.py` — crans + boutons intégrés des 2 encodeurs (dont le
-  mute matériel du HAT sur le bouton de l'encodeur volume)
+  mute logiciel sur le bouton de l'encodeur volume)
 - `test_favorite_buttons.py` — appui court/long des 10 boutons favoris
 - `test_leds.py` — LEDs action/lecture
 - `test_shutdown_button.py` — maintien du bouton d'arrêt (simulé, n'éteint pas)
