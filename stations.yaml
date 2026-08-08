@@ -243,6 +243,7 @@ stations:
     name: "Radio Nova"
     stream_urls:
       - "http://radionova.ice.infomaniak.ch/radionova-256.aac"
+      - "https://novazz.ice.infomaniak.ch/novazz-128.mp3"
     metadata:
       # Pas d'API de métadonnées connue (repris du projet e-paper : le flux
       # annonce icy-metaint mais StreamTitle est vide en permanence).
