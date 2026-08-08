@@ -4,8 +4,10 @@ Lecteur radio web sur Raspberry Pi 3, dans le même esprit "low-tech" que le
 premier projet ([`pi-radio-player-with-epaper-hat`](https://github.com/matthieuperez77/pi-radio-player-with-epaper-hat))
 mais avec un matériel différent : écran LCD caractères au lieu de l'e-Paper,
 encodeurs rotatifs au lieu du potentiomètre, sortie audio via un HAT Hi-Fi
-dédié, et un choix de stations bien plus large (réseau national Radio France
-+ sélection internationale).
+dédié, et un choix de stations bien plus large (réseau national Radio France,
+Radio Nova, et une sélection internationale allant du jazz/classique à des
+webradios allemandes, latino-américaines, flamenco, indiennes/tibétaines et
+italiennes).
 
 ## Matériel
 
