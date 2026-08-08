@@ -81,8 +81,8 @@ bloc fonctionnel et notes d'alimentation : voir
 
 Guide illustré pas-à-pas pensé pour un public débutant (schéma d'assemblage,
 zooms sur les pièges de montage, liste de matériel) : voir
-[`docs/GUIDE_CABLAGE.html`](docs/GUIDE_CABLAGE.html) — à ouvrir dans un
-navigateur.
+[matthieuperez77.github.io/pi-radio-player-hifi/GUIDE_CABLAGE.html](https://matthieuperez77.github.io/pi-radio-player-hifi/GUIDE_CABLAGE.html)
+(source : [`docs/GUIDE_CABLAGE.html`](docs/GUIDE_CABLAGE.html)).
 
 ## Installation
 
